@@ -130,3 +130,6 @@ dmypy.json
 
 # Ignore anything inside input
 input/
+
+# Ignore Apple crap
+.DS_Store*
