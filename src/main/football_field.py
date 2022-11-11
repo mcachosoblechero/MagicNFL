@@ -1,19 +1,20 @@
 import numpy as np
 from field_square import field_square
-
+from football_field_utils import *
 
 
 class football_field:
     """
+    I know realize this is probably mis-named, since its actualy a football_field_section or something like that
+        Should I re-name?
     xlims and ylims are TUPLES that need to be input
-
-    Choosing to set the lims NOT as the center points, but as the entire area of the field that must be covered
-    I think it will be more straight forward to feed the data in this way"""
-    
-    """ One funny thing is that the [0,0] of a matrix is the TOP left, 
-    but [0,0] of the field is the BOTTOM left"""
+    """
     
     def __init__(self, xlims, ylims, side_length, units="yrds"):
+
+        if type(xlims) is not tuple or type(ylims) is not tuple: 
+            raise TypeError("xlims and ylims must be a tuple of the form (x,y)")
+
         self.xlims=xlims
         self.ylims=ylims
         self.side_length=side_length
