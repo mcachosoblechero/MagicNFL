@@ -1,5 +1,5 @@
 """
-This is going to how we do the "usable pocket" analysis class, I think
+This is going to how we do the "usable pocket" analysis, I think
 
 Outstanding Items
 [] Left/Right Distinction
@@ -9,8 +9,6 @@ Outstanding Items
 [] Should I right-away convert the "center" square into a field_square object?
 |-- Pro: Can keep track of it
 |-- Cons: If we don't use it, then its just adding extra stuff to the code
-
-
 """
 
 class play_pocket(football_field):
@@ -28,6 +26,15 @@ class play_pocket(football_field):
         self.gameId=gameId
         self.playId=playId
         self.side_length=side_length
-    
-    def set_pocket_square_senter(self):
         self.pocket_square_center=find_center_of_square_containing(self.football_starting_coordinates, side_length)
+
+    def set_pocket_limits(self, pocket_width, pocket_depth):
+        self.ylims=(self.pocket_square_center[1]-pocket_width/2, self.pocket_square_center[1]+pocket_width/2)
+        if self.offense_direction=="left":
+            self.xlims=(self.pocket_square_center[0], self.pocket_square_center[0]+pocket_depth)
+        elif self.offense_direction=="right":
+            self.xlims=(self.pocket_square_center[0]-pocket_depth, self.pocket_square_center[0])
+        else:
+            raise ValueError("Offense Direction must be either 'left' or 'right'")
+
+        football_field.__init(football_field)
