@@ -34,3 +34,5 @@ class football_field:
             field_squares.append(tmp)
 
         self.field_squares=field_squares
+
+        
