@@ -1,13 +1,6 @@
-"""
-This is going to how we do the "usable pocket" analysis, I think
-
-Outstanding Items
-
-
-[] Should I right-away convert the "center" square into a field_square object?
-|-- Pro: Can keep track of it
-|-- Cons: If we don't use it, then its just adding extra stuff to the code
-"""
+from field_square import field_square
+from football_field_utils import *
+from football_field import *
 
 class play_pocket(football_field):
 

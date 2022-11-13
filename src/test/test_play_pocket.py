@@ -30,7 +30,7 @@ def test_init_assignments():
 
 
 left_pocket.set_pocket_limits(10, 7)
-right_pocket.set_pocket_limits((7.5, 4))
+right_pocket.set_pocket_limits(7.5, 4)
 
 def test_limit_assignments():
     assert left_pocket.xlims==(30, 40)
