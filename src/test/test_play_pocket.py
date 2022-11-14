@@ -21,10 +21,10 @@ def test_init_assignments():
     assert right_pocket.football_starting_coordinates==(90, 15)
 
     assert left_pocket.side_length==1
-    assert right_pocket.side_length==0,5
+    assert right_pocket.side_length==0.5
 
     assert left_pocket.offenseDirection=="left"
-    assert left_pocket.offenseDirection=="right"
+    assert right_pocket.offenseDirection=="right"
 
 
 
@@ -44,9 +44,9 @@ def test_limit_assignments():
 left_pocket.set_field_squares()
 right_pocket.set_field_squares()
 
-def test_football_field_squares():
-    assert type(left_pocket.field_squares[0]) is field_square.field_square
-    assert type(right_pocket.field_squares[19]) is field_square.field_square
+def test_pocket_field_squares():
+    assert type(left_pocket.field_squares[0]) is field_square
+    assert type(right_pocket.field_squares[19]) is field_square
 
     assert left_pocket.field_squares[0].side_length==left_pocket.side_length
     assert right_pocket.field_squares[15].side_length==right_pocket.side_length

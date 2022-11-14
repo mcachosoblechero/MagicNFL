@@ -5,17 +5,17 @@ from football_field import *
 class play_pocket(football_field):
 
     def __init__(self, 
-                football_starting_coordinates, side_length, offenceDirection, 
+                football_starting_coordinates, side_length, offenseDirection, 
                 gameId, playId):
         
         if type(football_starting_coordinates) is not tuple:
             raise TypeError("football_starting_coordinates must be a tuple of the form (x,y)")
             
-        if offenceDirection not in ["left", "right"]:
+        if offenseDirection not in ["left", "right"]:
             raise ValueError("offensive direction must be either 'left' or 'right'")
 
         self.football_starting_coordinates=football_starting_coordinates
-        self.offenceDirection=offenceDirection.lower()
+        self.offenseDirection=offenseDirection.lower()
         self.gameId=gameId
         self.playId=playId
         self.side_length=side_length
@@ -25,9 +25,9 @@ class play_pocket(football_field):
         """ Pocket_depth is the x value, because it goes towards the endzone (i.e. the x-value)
         """
         # X-Values -- Depends on which direction the offense is going
-        if self.offenceDirection=="left":
+        if self.offenseDirection=="left":
             self.xlims=(self.pocket_square_center[0], self.pocket_square_center[0]+pocket_depth)
-        elif self.offenceDirection=="right":
+        elif self.offenseDirection=="right":
             self.xlims=(self.pocket_square_center[0]-pocket_depth, self.pocket_square_center[0])
         else:
             raise ValueError("Offense Direction must be either 'left' or 'right'")
