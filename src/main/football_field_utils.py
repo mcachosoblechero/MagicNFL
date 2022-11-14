@@ -6,7 +6,7 @@ def find_center_of_square_containing(point, side_length):
     to make this work for side_length of arbitrary length (i.e. non-integer), 
     need to manipulate the value b/c math.floor will only return an integer
 
-    start run into floating-point errors (I think thats whats causing it, at least) when side_length > 0.00005. 
+    start run into floating-point errors (I think thats whats causing it, at least) when side_length < 0.00005. 
     I think this is ok for our purposes considering 0.00005 yards == 0.0018 inches == 0.04572 milimeters
     limiting factor now would be processing time anyway
     """

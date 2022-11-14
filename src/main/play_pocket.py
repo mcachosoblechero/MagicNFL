@@ -23,13 +23,36 @@ class play_pocket(football_field):
 
     def set_pocket_limits(self, pocket_depth, pocket_width):
         """ Pocket_depth is the x value, because it goes towards the endzone (i.e. the x-value)
+            The football x-coordinate is always the leading edge of the pocket
+            The football y-coordinate defines the y-value for the center of its own square
+            Adding the 'dangling' square so the entire pocket is contained in this definition 
         """
+
+
         # X-Values -- Depends on which direction the offense is going
+        needed_x_squares = math.ceil(pocket_depth/self.side_length) 
+        new_depth=needed_x_squares*self.side_length
+
         if self.offenseDirection=="left":
-            self.xlims=(self.pocket_square_center[0], self.pocket_square_center[0]+pocket_depth)
+            xlims=(self.football_starting_coordinates[0], 
+                        self.football_starting_coordinates[0]+new_depth)
+
         elif self.offenseDirection=="right":
-            self.xlims=(self.pocket_square_center[0]-pocket_depth, self.pocket_square_center[0])
+            xlims=(self.football_starting_coordinates[0]-new_depth, 
+                        self.football_starting_coordinates[0])
         else:
             raise ValueError("Offense Direction must be either 'left' or 'right'")
+
+
         # Y-Values are independent of the play direction
-        self.ylims=(self.pocket_square_center[1]-pocket_width/2, self.pocket_square_center[1]+pocket_width/2)
+        needed_y_squares = math.ceil(pocket_width/self.side_length)
+        new_width=needed_y_squares*self.side_length
+
+        ylims=(self.football_starting_coordinates[1]-new_width/2,
+                    self.football_starting_coordinates[1]+new_width/2)
+
+        self.xlims=(round(xlims[0], 3),
+                    round(xlims[1], 3))
+                    
+        self.ylims=(round(ylims[0], 3),
+                    round(ylims[1], 3))

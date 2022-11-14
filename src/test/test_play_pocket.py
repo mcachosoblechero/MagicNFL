@@ -30,14 +30,14 @@ def test_init_assignments():
 
 
 left_pocket.set_pocket_limits(10, 7)
-right_pocket.set_pocket_limits(7.5, 4)
+right_pocket.set_pocket_limits(7.3, 4.2)
 
 def test_limit_assignments():
     assert left_pocket.xlims==(30, 40)
-    assert left_pocket.ylims==(10.76, 24.76)
+    assert left_pocket.ylims==(14.26, 21.26)
 
-    assert right_pocket.xlims==(82.5, 97.5)
-    assert right_pocket.ylims==(11, 19)
+    assert right_pocket.xlims==(82.5, 90)
+    assert right_pocket.ylims==(12.75, 17.25)
 
 
 
@@ -51,6 +51,7 @@ def test_pocket_field_squares():
     assert left_pocket.field_squares[0].side_length==left_pocket.side_length
     assert right_pocket.field_squares[15].side_length==right_pocket.side_length
 
-    assert left_pocket.field_squares[1].center==(38.5, 11.26)
-    assert right_pocket.field_squares[10].center==(87.75, 11.25)
+    assert left_pocket.field_squares[1].center==(30.5, 15.76)
+    assert right_pocket.field_squares[0].center==(82.75, 13)
+    assert right_pocket.field_squares[1].center==(82.75, 13.5)
     
