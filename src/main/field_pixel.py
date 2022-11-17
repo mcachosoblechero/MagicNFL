@@ -1,8 +1,8 @@
 
-class field_square:
-    def __init__(self, center, side_length, units="yds"):
+class field_pixel:
+    def __init__(self, center, pixel_length, units="yds"):
         self.center=center
-        self.side_length=side_length
+        self.pixel_length=pixel_length
         self.units=units
         
     def set_square_corners(self):
@@ -15,11 +15,12 @@ class field_square:
                (x_0, y_1)     (x_1, y_1)  
         """
 
-        x_0=self.center[0]-(self.side_length/2)
-        x_1=self.center[0]+(self.side_length/2)
+        x_0=self.center[0]-(self.pixel_length/2)
+        x_1=self.center[0]+(self.pixel_length/2)
 
-        y_1=self.center[1]+(self.side_length/2)
-        y_0=self.center[1]-(self.side_length/2)
+        y_1=self.center[1]+(self.pixel_length/2)
+        y_0=self.center[1]-(self.pixel_length/2)
         
         self.square_corners=[(x_0, y_1), (x_1, y_1), 
                              (x_0, y_0), (x_1, y_0)]
+    
