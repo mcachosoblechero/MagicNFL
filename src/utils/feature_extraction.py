@@ -136,14 +136,20 @@ def extract_injury_features(plays_data):
 
     # I hate this way of solving this, but I don;t have internet to get a better way
     off_injury = []
+    off_players = []
     def_injury = []
+    def_players = []
     for record in injury_info:
         off_injury.append(record[0])
-        def_injury.append(record[1])
+        off_players.append(record[1])
+        def_injury.append(record[2])
+        def_players.append(record[3])
 
     # Assign to DataFrame
     play_injury['num_off_injuries'] = off_injury
+    play_injury['off_players_injured'] = off_players
     play_injury['num_def_injuries'] = def_injury 
+    play_injury['def_players_injured'] = def_players
 
     return play_injury
 
@@ -233,7 +239,7 @@ def determine_injury_side(x):
     '''
 
     # Define pattern - Acept teams with either 2 or 3 letters
-    pattern = '\. [a-z]{2,3}-[a-z]\..* was injured'
+    pattern = '[a-z]{2,3}-[a-z]\.[\s\-a-z]* was injured'
 
     # Extract valuable fields
     descrip = x.playDescription.lower()
@@ -242,22 +248,29 @@ def determine_injury_side(x):
 
     # Create final variables
     off_injury = 0
+    off_players = []
     def_injury = 0
+    def_players = []
 
     matches = re.findall(pattern, descrip)
+    
     if matches!=[]:
         for idx, match in enumerate(matches):
+
             # Extract team from string
             team = match.split("-")[0].split(" ")[-1]
+            player = match.replace(" was injured", "").split("-", 1)[1]
 
             # Determine which team has an injured player
             if team == offense:
                 off_injury += 1
+                off_players.append(player)
             elif team == defense:
                 def_injury += 1
+                def_players.append(player)
             else:
                 assert False, "Injury to neither team??"
 
-    return off_injury, def_injury
+    return off_injury, off_players, def_injury, def_players
 
 ################################################################
