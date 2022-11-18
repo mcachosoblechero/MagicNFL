@@ -45,4 +45,8 @@ non_divisible_field=football_field((1.3, 10), (1.3, 10), 0.5)
 
 def test_non_divisivble_field():
     with pytest.raises(ValueError, match="Limits must be perfectly divisible by the pixel_length") :
+<<<<<<< HEAD
         non_divisible_field.set_field_pixels()
+=======
+        non_divisible_field.set_field_pixels()
+>>>>>>> 5ef4ecb17b8d764a53b9887d6c7311d4106bf3d7
