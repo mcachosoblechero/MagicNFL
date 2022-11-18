@@ -5,8 +5,8 @@ import math
 import os
 import pytest
 
-sys.path.insert(0, "/Users/bryceturner/Personal_Projects/MagicNFL/src/main")
-from field_square import *
+sys.path.insert(0, "..\\main")
+from field_pixel import *
 from football_field import *
 from football_field_utils import *
 from play_pocket import *
@@ -20,8 +20,8 @@ def test_init_assignments():
     assert left_pocket.football_starting_coordinates==(30, 17.76)
     assert right_pocket.football_starting_coordinates==(90, 15)
 
-    assert left_pocket.side_length==1
-    assert right_pocket.side_length==0.5
+    assert left_pocket.pixel_length==1
+    assert right_pocket.pixel_length==0.5
 
     assert left_pocket.offenseDirection=="left"
     assert right_pocket.offenseDirection=="right"
@@ -41,17 +41,17 @@ def test_limit_assignments():
 
 
 
-left_pocket.set_field_squares()
-right_pocket.set_field_squares()
+left_pocket.set_field_pixels()
+right_pocket.set_field_pixels()
 
-def test_pocket_field_squares():
-    assert type(left_pocket.field_squares[0]) is field_square
-    assert type(right_pocket.field_squares[19]) is field_square
+def test_pocket_field_pixels():
+    assert type(left_pocket.field_pixels[0]) is field_pixel
+    assert type(right_pocket.field_pixels[19]) is field_pixel
 
-    assert left_pocket.field_squares[0].side_length==left_pocket.side_length
-    assert right_pocket.field_squares[15].side_length==right_pocket.side_length
+    assert left_pocket.field_pixels[0].pixel_length==left_pocket.pixel_length
+    assert right_pocket.field_pixels[15].pixel_length==right_pocket.pixel_length
 
-    assert left_pocket.field_squares[1].center==(30.5, 15.76)
-    assert right_pocket.field_squares[0].center==(82.75, 13)
-    assert right_pocket.field_squares[1].center==(82.75, 13.5)
+    assert left_pocket.field_pixels[1].center==(30.5, 15.76)
+    assert right_pocket.field_pixels[0].center==(82.75, 13)
+    assert right_pocket.field_pixels[1].center==(82.75, 13.5)
     
