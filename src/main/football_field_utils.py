@@ -1,6 +1,6 @@
 import math
 
-def find_center_of_square_containing(point, pixel_length):
+def find_center_of_pixel_containing(point, pixel_length):
     """ 
     going to use math.floor to find the lowest x,y value
     to make this work for side_length of arbitrary length (i.e. non-integer), 

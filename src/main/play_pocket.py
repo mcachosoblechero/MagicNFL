@@ -19,7 +19,7 @@ class play_pocket(football_field):
         self.gameId=gameId
         self.playId=playId
         self.pixel_length=pixel_length
-        self.pocket_square_center=find_center_of_square_containing(self.football_starting_coordinates, pixel_length)
+        self.pocket_pixel_center=find_center_of_pixel_containing(self.football_starting_coordinates, pixel_length)
 
     def set_pocket_limits(self, pocket_depth, pocket_width):
         """ Pocket_depth is the x value, because it goes towards the endzone (i.e. the x-value)
