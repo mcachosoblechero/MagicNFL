@@ -22,6 +22,8 @@ def extract_play_outcome_features(plays_data):
     # Play Identifiers
     play_outcome['gameId'] = plays_data.gameId
     play_outcome['playId'] = plays_data.playId
+    # pass_complete - Self-explanatory
+    play_outcome['pass_complete'] = plays_data.passResult.apply(lambda x : True if (x=='C') else False)
     # Has_pocket_hold - This feature answers the question, was the QB able to pass inside the pocket? 
     # This includes C, I and IN; as in all these plays the QB is able to pass the ball
     play_outcome['has_pocket_hold'] = plays_data.passResult.apply(lambda x : True if (x=='C')|(x=='I')|(x=='IN') else False)
