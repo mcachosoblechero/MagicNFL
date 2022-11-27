@@ -101,3 +101,42 @@ def preprocessPlay_refQB(team1, team2, ball, input_path = "../input/"):
         # element['y'] = element.groupby['nlfId'].apply(lambda player: player.y - qb_ref.y)
 
     return team1, team2, ball
+
+def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, input_path = "../input/"):
+
+    """
+    Modify the play to have as reference the QB position during the play, with a limit in the number of frames
+    Team 1 is always the offensive team, Team 2 is always the defensive
+    :param team1: DataFrame with all info regarding team1
+    :param team2: DataFrame with all info regarding team2
+    :param ball: DataFrame with all info regarding the ball
+    :param delay_frame: Number of frames where the QB is used as reference
+    :return team1: DataFrame with normalized info regarding team1, based on the QB positon
+    :return team2: DataFrame with normalized info regarding team2, based on the QB positon
+    :return ball: DataFrame with normalized info regarding the ball, based on the QB positon
+    """
+    # Extract which team from the offensive team is the QB
+    # - Obtain list of players
+    list_players = team1.nflId.unique().tolist()
+    # - Extract QB ID
+    qb_id = pd.read_csv(os.path.join(input_path, 'players.csv')).query("nflId == @list_players & officialPosition == 'QB'").nflId.values.flatten()[0]
+
+    # Extract QB positions across the different frames
+    qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']].sort_values(['frameId']).set_index('frameId')
+    num_frames = len(ball)
+    for frame in range(num_frames):
+        if frame > delay_frame:
+            qb_ref.loc[frame, ['x', 'y']] = qb_ref.loc[delay_frame, ['x', 'y']]
+
+    # All coordinates are now placed referenced to the QB coordinates
+    elements = [team1, team2, ball]
+    for element in elements:
+        for frame in range(num_frames):
+            ref_x, ref_y = qb_ref.iloc[frame].values
+            element.loc[element.frameId == frame, 'x'] = element.loc[element.frameId == frame, 'x'] - ref_x
+            element.loc[element.frameId == frame, 'y'] = element.loc[element.frameId == frame, 'y'] - ref_y
+        
+        # I tried to do this with GroupBy and it simply doesn't like it
+        # element['y'] = element.groupby['nlfId'].apply(lambda player: player.y - qb_ref.y)
+
+    return team1, team2, ball
