@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -33,9 +34,9 @@ def extractPlay(week_data, gameId, playId, input_path = "../input/"):
     # Extract information for each team
     for team in teams:
         if team == off_team:
-            team1 = play_data.loc[play_data.team == teams[0], ['frameId', 'nflId', 'x', 'y', 's', 'a', 'dis', 'o', 'dir', 'event']]
+            team1 = play_data.loc[play_data.team == team, ['frameId', 'team', 'nflId', 'x', 'y', 's', 'a', 'dis', 'o', 'dir', 'event']]
         else:
-            team2 = play_data.loc[play_data.team == teams[1], ['frameId', 'nflId', 'x', 'y', 's', 'a', 'dis', 'o', 'dir','event']]
+            team2 = play_data.loc[play_data.team == team, ['frameId', 'team', 'nflId', 'x', 'y', 's', 'a', 'dis', 'o', 'dir','event']]
 
     # Extract information about the ball
     ball = play_data.loc[play_data.team == "football", ['frameId', 'x', 'y', 's', 'a', 'dis', 'event']]
@@ -66,7 +67,7 @@ def preprocessPlay_refBallInit(team1, team2, ball):
 
     return team1, team2, ball
 
-def preprocessPlay_refQB(team1, team2, ball, input_path = "../input/"):
+def preprocessPlay_refQB(team1, team2, ball, post_snap_time = 8, input_path = "../input/"):
 
     """
     Modify the play to have as reference the QB position during the play
@@ -74,6 +75,7 @@ def preprocessPlay_refQB(team1, team2, ball, input_path = "../input/"):
     :param team1: DataFrame with all info regarding team1
     :param team2: DataFrame with all info regarding team2
     :param ball: DataFrame with all info regarding the ball
+    :param post_snap_time: Number of frames from snap to QB definition
     :return team1: DataFrame with normalized info regarding team1, based on the QB positon
     :return team2: DataFrame with normalized info regarding team2, based on the QB positon
     :return ball: DataFrame with normalized info regarding the ball, based on the QB positon
@@ -83,7 +85,25 @@ def preprocessPlay_refQB(team1, team2, ball, input_path = "../input/"):
     # - Obtain list of players
     list_players = team1.nflId.unique().tolist()
     # - Extract QB ID
-    qb_id = pd.read_csv(os.path.join(input_path, 'players.csv')).query("nflId == @list_players & officialPosition == 'QB'").nflId.values.flatten()[0]
+    qb_id = pd.read_csv(os.path.join(input_path, 'players.csv')).query("nflId == @list_players & officialPosition == 'QB'")
+    # - Run certain checks - QB available and only one QB
+    # - If an error is raised, we look for the QB
+    if (qb_id.empty) | (len(qb_id) > 1):
+
+        # - Determine the moment the ball was snapped
+        frame_snap = ball.loc[ball.event == 'ball_snap', 'frameId'].values[0] + post_snap_time
+
+        # - Extract information regarding relative position of players from ball
+        ball_pos = ball.loc[ball.frameId == frame_snap, ['x', 'y', 'event']]
+        dist_players = team1.loc[team1.frameId == frame_snap, ['nflId', 'x', 'y']]
+
+        # - Determine which player has the ball in frame frame_qb
+        dist_players['abs_distance'] = dist_players.apply(lambda player: math.sqrt((player.x - ball_pos.x)**2 + (player.y - ball_pos.y)**2), axis=1)
+        qb_id = dist_players.loc[dist_players.abs_distance == min(dist_players.abs_distance), 'nflId'].values[0]
+
+    else:
+        # If everything is ok, move on
+        qb_id = qb_id.nflId.values.flatten()[0]
 
     # Extract QB positions across the different frames
     qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']].sort_values(['frameId']).set_index('frameId')
@@ -102,7 +122,7 @@ def preprocessPlay_refQB(team1, team2, ball, input_path = "../input/"):
 
     return team1, team2, ball
 
-def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, input_path = "../input/"):
+def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, post_snap_time = 8, input_path = "../input/"):
 
     """
     Modify the play to have as reference the QB position during the play, with a limit in the number of frames
@@ -111,6 +131,7 @@ def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, input_path
     :param team2: DataFrame with all info regarding team2
     :param ball: DataFrame with all info regarding the ball
     :param delay_frame: Number of frames where the QB is used as reference
+    :param post_snap_time: Number of frames from snap to QB definition
     :return team1: DataFrame with normalized info regarding team1, based on the QB positon
     :return team2: DataFrame with normalized info regarding team2, based on the QB positon
     :return ball: DataFrame with normalized info regarding the ball, based on the QB positon
@@ -119,7 +140,25 @@ def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, input_path
     # - Obtain list of players
     list_players = team1.nflId.unique().tolist()
     # - Extract QB ID
-    qb_id = pd.read_csv(os.path.join(input_path, 'players.csv')).query("nflId == @list_players & officialPosition == 'QB'").nflId.values.flatten()[0]
+    qb_id = pd.read_csv(os.path.join(input_path, 'players.csv')).query("nflId == @list_players & officialPosition == 'QB'")
+    # - Run certain checks - QB available and only one QB
+    # - If an error is raised, we look for the QB
+    if (qb_id.empty) | (len(qb_id) > 1):
+
+        # - Determine the moment the ball was snapped
+        frame_snap = ball.loc[ball.event == 'ball_snap', 'frameId'].values[0] + post_snap_time
+
+        # - Extract information regarding relative position of players from ball
+        ball_pos = ball.loc[ball.frameId == frame_snap, ['x', 'y', 'event']]
+        dist_players = team1.loc[team1.frameId == frame_snap, ['nflId', 'x', 'y']]
+
+        # - Determine which player has the ball in frame frame_qb
+        dist_players['abs_distance'] = dist_players.apply(lambda player: math.sqrt((player.x - ball_pos.x)**2 + (player.y - ball_pos.y)**2), axis=1)
+        qb_id = dist_players.loc[dist_players.abs_distance == min(dist_players.abs_distance), 'nflId'].values[0]
+
+    else:
+        # If everything is ok, move on
+        qb_id = qb_id.nflId.values.flatten()[0]
 
     # Extract QB positions across the different frames
     qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']].sort_values(['frameId']).set_index('frameId')
