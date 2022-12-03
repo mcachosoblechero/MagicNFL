@@ -3,6 +3,7 @@ import re
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -178,7 +179,7 @@ def drawPocket(width = 30):
  
 
  # Animate one play based on the provided data - Inspired by https://www.kaggle.com/code/werooring/nfl-big-data-bowl-basic-eda-for-beginner
-def animatePlay_Generic(team1, team2, ball, area_drawn):
+def animatePlay_Generic(team1, team2, ball, area_drawn, store_path=""):
 
     """
     This function animates a play, based on the area provided.
@@ -186,6 +187,7 @@ def animatePlay_Generic(team1, team2, ball, area_drawn):
     :param team2: Information about the defensive team
     :param ball: Information about the ball
     :param area_drawn: Function that defines the area drawn
+    :param store_path: If required, store the output video in this path
     :return: HTML animation
     """
 
@@ -247,5 +249,48 @@ def animatePlay_Generic(team1, team2, ball, area_drawn):
     # !May take a while!
     anim = animation.FuncAnimation(fig, animate, init_func=init,
                                    frames=len(ball), interval=100, blit=True)
+    # Store if required
+    if store_path != "":
+        writer = animation.FFMpegWriter(fps=10, metadata=dict(artist='Me'), bitrate=1800)
+        anim.save(store_path, writer=writer)
+
+    return HTML(anim.to_html5_video())
+
+
+def animateScores(scores, store_path=""):
+
+    """
+    This function animates the scores associated with a play.
+    :param scores: Scores to plot. This needs to be a matrix
+    :param store_path: If required, store the output video in this path
+    :return: HTML animation
+    """
+
+    # Create the pitch object - Pass a function
+    fig = plt.figure(figsize=(10,10))
+    ax = plt.axes()
+
+    # Set the plots to be drawn
+    im_scores = ax.imshow(scores[0], cmap = matplotlib.cm.get_cmap('RdYlGn_r'))
+    fig.colorbar(im_scores, orientation='vertical')
+    drawings = [im_scores]
+
+    # Initially, initial frame is plotted
+    def init():
+        im_scores.set_array(scores[0])
+        return drawings
+
+    def animate(i):
+        im_scores.set_array(scores[i])
+        return drawings
+    
+    # !May take a while!
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                   frames=len(scores), interval=100, blit=True)
+
+    # Store if required
+    if store_path != "":
+        writer = animation.FFMpegWriter(fps=10, metadata=dict(artist='Me'), bitrate=1800)
+        anim.save(store_path, writer=writer)
 
     return HTML(anim.to_html5_video())

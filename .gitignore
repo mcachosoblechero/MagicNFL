@@ -130,6 +130,8 @@ dmypy.json
 
 # Ignore anything inside input
 input/
+# Ignore generated videos
+videos/
 
 # Ignore Apple crap
 .DS_Store*
