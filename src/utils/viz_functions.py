@@ -16,7 +16,7 @@ from matplotlib import animation
 from IPython.display import HTML
 from IPython import display
 
-from utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
+from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
 
 # Figure visualization, inspired by https://www.kaggle.com/code/jaronmichal/tracking-data-visualization/notebook
 # De-parametrized it, setting the field to 100 x 53.3 yards 
