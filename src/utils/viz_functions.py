@@ -295,8 +295,6 @@ def animateScores(scores, store_path=""):
     if store_path != "":
         writer = animation.FFMpegWriter(fps=10, metadata=dict(artist='Me'), bitrate=1800)
         anim.save(store_path, writer=writer)
-    
-    plt.show()
 
     return HTML(anim.to_html5_video())
 
