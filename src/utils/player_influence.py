@@ -22,13 +22,6 @@ from IPython.display import HTML
 from IPython import display
 
 
-# Custom libraries
-sys.path.append('../')
-from src.utils.feature_extraction import extract_play_outcome_features, extract_formation_features, extract_foul_features, extract_injury_features, extract_game_features
-from definitions.fouls_def import ignore_fouls
-from src.utils.viz_functions import drawPitch, drawPocket, animatePlay_Generic, animateScores
-from src.utils.play_preprocessing import extractPlay, preprocessPlay_refBallInit, preprocessPlay_refQB, preprocessPlay_refQB_NFrames
-
 def gaussian_player_influence_score(player_x, player_y, pixel_x, pixel_y, config):
 
     '''
