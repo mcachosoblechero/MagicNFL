@@ -17,6 +17,7 @@ from IPython.display import HTML
 from IPython import display
 
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
+from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
 
 # Figure visualization, inspired by https://www.kaggle.com/code/jaronmichal/tracking-data-visualization/notebook
 # De-parametrized it, setting the field to 100 x 53.3 yards 
@@ -317,6 +318,19 @@ def visualize_play(week_data, gameId, playId, config):
     display.display(fig_field)
     plt.close()
 
-    ###############################################################
-    # This function can be enhanced with plotting of the score    #
-    ###############################################################
+    # Analyze the position of the defensive players
+    # Calculate players influence
+    scores = extract_play_players_influence(
+        team_def=team2,
+        infl_funct=config['player_infl_funct'],
+        config=config
+    )
+
+    # Plot the play
+    fig_scores = animateScores(scores, store_path=f"../videos/{gameId}_{playId}_scores.mp4")
+    display.display(fig_scores)
+    plt.close()
+
+    #########################################################################
+    # This function can be enhanced with plotting of the score with time    #
+    #########################################################################
