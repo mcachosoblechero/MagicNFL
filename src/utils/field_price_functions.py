@@ -58,3 +58,22 @@ def linear_field_price(pixel_x, pixel_y, config):
     Z[Z<0] = 0
 
     return Z
+
+def calculate_field_price(price_funct, config):
+
+    """
+    Based on the provided price function, calculate field price
+    :param price_funct: Custom Price Function
+    :param config: Run Parameters
+    :return: Field Price
+    """
+
+    # Create a mesh of values
+    pocket_pos_start = -(config['pocket_len']/2)
+    pocket_pos_end = (config['pocket_len']/2)
+    x = np.arange(pocket_pos_start, pocket_pos_end, config['pocket_res'])
+    y = np.arange(pocket_pos_start, pocket_pos_end, config['pocket_res'])
+    x, y = np.meshgrid(x, y)
+
+    # Perform price calculation
+    return price_funct(x, y, config)
