@@ -76,7 +76,7 @@ def run_full_pipeline(input_path, output_path, config):
 
             # Extract info from the play
             team1, team2, ball = extractPlay(week_data, gameId, playId)
-            team1, team2, ball = preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame=config['hold_QB_ref'])
+            team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
 
             ############################################################
             # Extract player influence
