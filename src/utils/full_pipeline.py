@@ -26,6 +26,92 @@ from src.utils.player_influence import extract_play_players_influence, gaussian_
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_score
 
+def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"):
+    """
+    This function performs all operations required for the pipeline execution, limited to a provided plays. 
+    All operations are parametrized through CONFIG
+    This pipeline performs the following operations:
+    1- Extract features
+    2- Process provided plays and extract their pocket scores
+    3- Correlate features with pocket score
+    :param input_path: Input path to raw data
+    :param plays: List of (weekId, gameId, playId) to analyze
+    :param output_path: Path for processed datasets
+    :param config: Run Parameters
+    :param runId: ID to identify each run 
+    """
+
+    play_features_file = f"{output_path}/play_features_{runId}.csv"
+    game_features_file = f"{output_path}/game_features_{runId}.csv"
+    scores_and_features_file = f"{output_path}/play_scores_and_features_{runId}.csv"
+
+    ##########################################
+    # STEP 1 - CREATE FEATURE VECTOR         #
+    ########################################## 
+    # Load information regarding plays
+    plays_data = pd.read_csv(os.path.join(input_path, 'plays.csv'))
+
+    # Perform all play feature extractions
+    plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
+    plays_formation = extract_formation_features(plays_data).set_index(['gameId', 'playId'])
+    plays_fouls = extract_foul_features(plays_data).set_index(['gameId', 'playId'])
+    plays_injury = extract_injury_features(plays_data).set_index(['gameId', 'playId'])
+
+    # Merge all these tables into one single big table
+    play_features = pd.concat([plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
+    play_features.to_csv(play_features_file)
+
+    # Load information regarding games
+    games_data = pd.read_csv(os.path.join(input_path, 'games_enhanced.csv'))
+
+    # Performing all game feature extractions
+    games_features = extract_game_features(games_data)
+    games_features.to_csv(game_features_file)
+
+    ##########################################
+    # STEP 2 - PREPROCESS ALL PLAYS          #
+    ##########################################
+    all_scores_info = []
+    for weekId, gameId, playId in tqdm.tqdm(plays):
+
+        # Load information for an entire week
+        week_data = pd.read_csv(os.path.join(input_path, weekId))
+
+        # Extract info from the play
+        team1, team2, ball = extractPlay(week_data, gameId, playId)
+        team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
+
+        ############################################################
+        # Extract player influence
+        players_influence = extract_play_players_influence(team2, infl_funct=config['player_infl_funct'], config=config)
+
+        # Extract field price
+        field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+
+        # Calculate scores
+        pocketScoreTimeSeries = calculate_score(players_influence, field_price)
+        pocketScore = np.average(pocketScoreTimeSeries)
+        ############################################################
+
+        all_scores_info.append({
+            'gameId': gameId,
+            'playId': playId,
+            'offTeam': team1.team.drop_duplicates().values[0],
+            'pocketScore': pocketScore,
+            'pocketScoreTimeSeries': pocketScoreTimeSeries
+        })
+
+    # Merge scores with play features
+    scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
+    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
+    play_scores_and_features.to_csv(scores_and_features_file)
+
+    ##########################################
+    # STEP 3 - ANALYZE THE RESULTS           #
+    ########################################## 
+    # Perform analysis by Single Play
+    evaluate_singleplay_scores(scores_and_features_file)
+
 def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 
     """
@@ -106,7 +192,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
             field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
             # Calculate scores
-            pocketScore = calculate_score(players_influence, field_price)
+            pocketScore = np.average(calculate_score(players_influence, field_price))
             ############################################################
             # For now, we will include random values
             # pocketScore = random.uniform(0, 1)
