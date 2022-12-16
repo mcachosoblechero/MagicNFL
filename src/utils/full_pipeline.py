@@ -131,14 +131,14 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     evaluate_singleplay_scores(scores_and_features_file)
 
     # Aggregate by match
-    result = agg_scores_by_match(scores_and_features_file)
+    result = agg_scores_by_match(scores_and_features_file, game_features_file)
     result.to_csv(match_scores_file)
 
     # Perform analysis by Match
     evaluate_match_scores(match_scores_file)
 
     # Aggregate by season
-    season_result = agg_scores_by_season(scores_and_features_file)
+    season_result = agg_scores_by_season(scores_and_features_file, game_features_file)
     season_result.to_csv(season_scores_file)
 
     # Perform analysis by Match
