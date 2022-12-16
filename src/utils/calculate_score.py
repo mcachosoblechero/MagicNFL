@@ -31,4 +31,4 @@ def calculate_score(players_influence, field_price):
     :return: Pocket Score
     """
 
-    return np.average(np.sum(np.sum(np.multiply(players_influence, field_price), axis=2), axis=1))
+    return np.sum(np.sum(np.multiply(players_influence, field_price), axis=2), axis=1)
