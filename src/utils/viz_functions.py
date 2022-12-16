@@ -18,6 +18,7 @@ from IPython import display
 
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
+from src.utils.field_price_functions import calculate_field_price
 
 # Figure visualization, inspired by https://www.kaggle.com/code/jaronmichal/tracking-data-visualization/notebook
 # De-parametrized it, setting the field to 100 x 53.3 yards 
@@ -311,7 +312,7 @@ def visualize_play(week_data, gameId, playId, config):
     plt.close()
 
     # Preprocess the play
-    team1, team2, ball = preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
+    team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
 
     # Plot the play in the Pocket
     fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
@@ -320,17 +321,25 @@ def visualize_play(week_data, gameId, playId, config):
 
     # Analyze the position of the defensive players
     # Calculate players influence
-    scores = extract_play_players_influence(
+    player_infl = extract_play_players_influence(
         team_def=team2,
         infl_funct=config['player_infl_funct'],
         config=config
     )
 
     # Plot the play
-    fig_scores = animateScores(scores, store_path=f"../videos/{gameId}_{playId}_scores.mp4")
-    display.display(fig_scores)
+    fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.mp4")
+    display.display(fig_influence)
     plt.close()
 
-    #########################################################################
-    # This function can be enhanced with plotting of the score with time    #
-    #########################################################################
+    # Analyze the score timeline
+    # Extract field price
+    field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+    # Calculate frames score
+    frames_scores = np.sum(np.sum(np.multiply(player_infl, field_price), axis=2), axis=1)
+    # Plot frame scores
+    plt.figure(figsize=(8,5))
+    plt.plot(frames_scores)
+    plt.title("Score over time")
+    plt.xlabel("Frames")
+    plt.ylabel("Pocket Score")
