@@ -21,7 +21,7 @@ from IPython import display
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
 from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features
 from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
-from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores
+from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores, evaluate_time_series_score
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_score
@@ -67,6 +67,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Performing all game feature extractions
     games_features = extract_game_features(games_data)
     games_features.to_csv(game_features_file)
+    ##########################################
 
     ##########################################
     # STEP 2 - PREPROCESS ALL PLAYS          #
@@ -103,14 +104,19 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
     # Merge scores with play features
     scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
-    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
+    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1, join="inner")
     play_scores_and_features.to_csv(scores_and_features_file)
+    ##########################################
 
     ##########################################
     # STEP 3 - ANALYZE THE RESULTS           #
     ########################################## 
     # Perform analysis by Single Play
     evaluate_singleplay_scores(scores_and_features_file)
+
+    # Extract information regarding Score Time Series
+    evaluate_time_series_score(play_scores_and_features)
+    ##########################################
 
 def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 

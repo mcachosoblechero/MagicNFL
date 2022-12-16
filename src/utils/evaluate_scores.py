@@ -386,3 +386,74 @@ def evaluate_singleplay_scores(scores_file):
     plt.xlabel("Number of Defensive Injuries")
     plt.ylabel("Pocket Score")
     plt.title("Score vs Def Injuries")
+
+def evaluate_time_series_score(play_scores_and_features):
+
+    """
+    Generate a set of plots describing the time series evolution of a pocket score
+    :param play_scores_and_features: Information extracted from Pocket analysis
+    """
+
+    # Display score time series 
+    # Analyze - Raw Pocket Score
+    plt.figure(figsize=(8,6))
+    legend_labels = []
+    for play_score in play_scores_and_features.iterrows():
+        plt.plot(play_score[1].pocketScoreTimeSeries)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Raw Pocket Score Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Pass Complete
+    plt.figure(figsize=(8,6))
+    legend_labels = []
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].pass_complete == True:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Pass Complete Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Has Pocket Hold
+    plt.figure(figsize=(8,6))
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].has_pocket_hold == True:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Has Pocket Hold? Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Has Pocket Hold
+    plt.figure(figsize=(8,6))
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].was_qb_sacked == False:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Was QB sacked? Analysis")
+    plt.legend(legend_labels)
+    plt.show()
