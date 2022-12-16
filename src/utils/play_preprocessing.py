@@ -43,7 +43,7 @@ def extractPlay(week_data, gameId, playId, input_path = "../input/"):
 
     return team1, team2, ball
 
-def preprocessPlay_refBallInit(team1, team2, ball):
+def preprocessPlay_refBallInit(team1, team2, ball, delay_frame = 6, post_snap_time = 8, input_path = "../input/"):
     
     """
     Modify the play to have as reference the initial position of the ball
@@ -51,6 +51,8 @@ def preprocessPlay_refBallInit(team1, team2, ball):
     :param team1: DataFrame with all info regarding team1
     :param team2: DataFrame with all info regarding team2
     :param ball: DataFrame with all info regarding the ball
+    :param delay_frame: NOT REQUIRED - ADDED TO MAKE THIS FUNCTION A PARAMETER
+    :param post_snap_time: NOT REQUIRED - ADDED TO MAKE THIS FUNCTION A PARAMETER
     :return team1: DataFrame with normalized info regarding team1, based on the initial position of the ball
     :return team2: DataFrame with normalized info regarding team2, based on the initial position of the ball
     :return ball: DataFrame with normalized info regarding the ball, based on the initial position of the ball
@@ -67,7 +69,7 @@ def preprocessPlay_refBallInit(team1, team2, ball):
 
     return team1, team2, ball
 
-def preprocessPlay_refQB(team1, team2, ball, post_snap_time = 8, input_path = "../input/"):
+def preprocessPlay_refQB(team1, team2, ball, delay_frame = 6, post_snap_time = 8, input_path = "../input/"):
 
     """
     Modify the play to have as reference the QB position during the play
@@ -75,6 +77,7 @@ def preprocessPlay_refQB(team1, team2, ball, post_snap_time = 8, input_path = ".
     :param team1: DataFrame with all info regarding team1
     :param team2: DataFrame with all info regarding team2
     :param ball: DataFrame with all info regarding the ball
+    :param delay_frame: NOT REQUIRED - ADDED TO MAKE THIS FUNCTION A PARAMETER
     :param post_snap_time: Number of frames from snap to QB definition
     :return team1: DataFrame with normalized info regarding team1, based on the QB positon
     :return team2: DataFrame with normalized info regarding team2, based on the QB positon

@@ -22,8 +22,11 @@ from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFram
 from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features
 from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
 from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_agg_scores
+from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
+from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
+from src.utils.calculate_score import calculate_score
 
-def run_full_pipeline(input_path, output_path, config, score_funct):
+def run_full_pipeline(input_path, output_path, config):
 
     features_file = f"{output_path}/play_features.csv"
     scores_and_features_file = f"{output_path}/play_scores_and_features.csv"
@@ -73,13 +76,20 @@ def run_full_pipeline(input_path, output_path, config, score_funct):
 
             # Extract info from the play
             team1, team2, ball = extractPlay(week_data, gameId, playId)
-            team1, team2, ball = preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame=config['hold_QB_ref'])
+            team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
 
-            # # Obtain the score based on the function
-            # pocketScore = score_funct(team1, team2, ball)
+            ############################################################
+            # Extract player influence
+            players_influence = extract_play_players_influence(team2, infl_funct=config['player_infl_funct'], config=config)
+
+            # Extract field price
+            field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+
+            # Calculate scores
+            pocketScore = calculate_score(players_influence, field_price)
             ############################################################
             # For now, we will include random values
-            pocketScore = random.uniform(0, 1)
+            # pocketScore = random.uniform(0, 1)
             ############################################################
 
             all_scores_info.append({
