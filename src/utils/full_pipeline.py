@@ -19,9 +19,9 @@ from IPython.display import HTML
 from IPython import display
 
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
-from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features
+from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features
 from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
-from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_agg_scores
+from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_score
@@ -40,7 +40,8 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     :param runId: ID to identify each run 
     """
 
-    features_file = f"{output_path}/play_features_{runId}.csv"
+    play_features_file = f"{output_path}/play_features_{runId}.csv"
+    game_features_file = f"{output_path}/game_features_{runId}.csv"
     scores_and_features_file = f"{output_path}/play_scores_and_features_{runId}.csv"
     match_scores_file = f"{output_path}/match_scores_and_features_{runId}.csv"
     season_scores_file = f"{output_path}/season_scores_and_features_{runId}.csv"
@@ -51,7 +52,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     # Load information regarding plays
     plays_data = pd.read_csv(os.path.join(input_path, 'plays.csv'))
 
-    # Perform all feature extractions
+    # Perform all play feature extractions
     plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
     plays_formation = extract_formation_features(plays_data).set_index(['gameId', 'playId'])
     plays_fouls = extract_foul_features(plays_data).set_index(['gameId', 'playId'])
@@ -59,7 +60,14 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 
     # Merge all these tables into one single big table
     play_features = pd.concat([plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
-    play_features.to_csv(features_file)
+    play_features.to_csv(play_features_file)
+
+    # Load information regarding games
+    games_data = pd.read_csv(os.path.join(input_path, 'games_enhanced.csv'))
+
+    # Performing all game feature extractions
+    games_features = extract_game_features(games_data)
+    games_features.to_csv(game_features_file)
 
     ##########################################
     # STEP 2 - PREPROCESS ALL PLAYS          #
@@ -127,11 +135,11 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     result.to_csv(match_scores_file)
 
     # Perform analysis by Match
-    evaluate_agg_scores(match_scores_file)
+    evaluate_match_scores(match_scores_file)
 
     # Aggregate by season
     season_result = agg_scores_by_season(scores_and_features_file)
     season_result.to_csv(season_scores_file)
 
     # Perform analysis by Match
-    evaluate_agg_scores(season_scores_file)
+    evaluate_season_scores(season_scores_file)
