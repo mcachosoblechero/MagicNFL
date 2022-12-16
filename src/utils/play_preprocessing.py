@@ -109,16 +109,16 @@ def preprocessPlay_refQB(team1, team2, ball, delay_frame = 6, post_snap_time = 8
         qb_id = qb_id.nflId.values.flatten()[0]
 
     # Extract QB positions across the different frames
-    qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']].sort_values(['frameId']).set_index('frameId')
+    qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']]
 
     # All coordinates are now placed referenced to the QB coordinates
     elements = [team1, team2, ball]
-    num_frames = len(ball)
+    frameIds = ball.frameId.unique()
     for element in elements:
-        for frame in range(num_frames):
-            ref_x, ref_y = qb_ref.iloc[frame].values
-            element.loc[element.frameId == frame, 'x'] = element.loc[element.frameId == frame, 'x'] - ref_x
-            element.loc[element.frameId == frame, 'y'] = element.loc[element.frameId == frame, 'y'] - ref_y
+        for frameId in frameIds:
+            ref_x, ref_y = qb_ref.loc[qb_ref.frameId == frameId, ['x', 'y']].values[0]
+            element.loc[element.frameId == frameId, 'x'] = element.loc[element.frameId == frameId, 'x'] - ref_x
+            element.loc[element.frameId == frameId, 'y'] = element.loc[element.frameId == frameId, 'y'] - ref_y
         
         # I tried to do this with GroupBy and it simply doesn't like it
         # element['y'] = element.groupby['nlfId'].apply(lambda player: player.y - qb_ref.y)
@@ -164,17 +164,17 @@ def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, post_snap_
         qb_id = qb_id.nflId.values.flatten()[0]
 
     # Extract QB positions across the different frames
-    qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']].sort_values(['frameId']).set_index('frameId')
-    num_frames = len(ball)
-    for frame in range(num_frames):
+    qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']]
+    frameIds = ball.frameId.unique()
+    for frame in frameIds:
         if frame > delay_frame:
             qb_ref.loc[frame, ['x', 'y']] = qb_ref.loc[delay_frame, ['x', 'y']]
 
     # All coordinates are now placed referenced to the QB coordinates
     elements = [team1, team2, ball]
     for element in elements:
-        for frame in range(num_frames):
-            ref_x, ref_y = qb_ref.iloc[frame].values
+        for frame in frameIds:
+            ref_x, ref_y = qb_ref.loc[qb_ref.frameId == frame, ['x', 'y']].values[0]
             element.loc[element.frameId == frame, 'x'] = element.loc[element.frameId == frame, 'x'] - ref_x
             element.loc[element.frameId == frame, 'y'] = element.loc[element.frameId == frame, 'y'] - ref_y
         
