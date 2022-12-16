@@ -26,12 +26,24 @@ from src.utils.player_influence import extract_play_players_influence, gaussian_
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_score
 
-def run_full_pipeline(input_path, output_path, config):
+def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 
-    features_file = f"{output_path}/play_features.csv"
-    scores_and_features_file = f"{output_path}/play_scores_and_features.csv"
-    match_scores_file = f"{output_path}/match_scores_and_features.csv"
-    season_scores_file = f"{output_path}/season_scores_and_features.csv"
+    """
+    This function performs all operations required for the pipeline execution. All operations are parametrized through CONFIG
+    This pipeline performs the following operations:
+    1- Extract features
+    2- Process all plays and extract their pocket scores
+    3- Correlate features with pocket score
+    :param input_path: Input path to raw data
+    :param output_path: Path for processed datasets
+    :param config: Run Parameters
+    :param runId: ID to identify each run 
+    """
+
+    features_file = f"{output_path}/play_features_{runId}.csv"
+    scores_and_features_file = f"{output_path}/play_scores_and_features_{runId}.csv"
+    match_scores_file = f"{output_path}/match_scores_and_features_{runId}.csv"
+    season_scores_file = f"{output_path}/season_scores_and_features_{runId}.csv"
 
     ##########################################
     # STEP 1 - CREATE FEATURE VECTOR         #
