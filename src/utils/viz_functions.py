@@ -351,3 +351,4 @@ def visualize_play(week_data, gameId, playId, config):
     plt.title("Score over time")
     plt.xlabel("Frames")
     plt.ylabel("Pocket Score")
+    plt.show()
