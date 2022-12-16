@@ -302,6 +302,14 @@ def animateScores(scores, store_path=""):
 
 def visualize_play(week_data, gameId, playId, config):
 
+    """
+    This function visualize a single play, generating all perspectives.
+    :param week_data: Week data for the play under study
+    :param gameId: GameId to analyze
+    :param playId: PlayId to analyze
+    :param config: Run Parameters
+    """
+
     # Full Pitch Evaluation
     # Extract info from the play
     team1, team2, ball = extractPlay(week_data, gameId, playId)
