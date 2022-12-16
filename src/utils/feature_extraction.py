@@ -155,6 +155,15 @@ def extract_injury_features(plays_data):
 
     return play_injury
 
+def extract_game_features(games_data):
+    '''
+    Function to extract game features
+    :param games_data: DataFrame containing games raw information
+    :return: DataFrame with gameId and associated data
+    '''
+
+    return games_data.groupby(['gameId']).apply(process_game_record).reset_index(level=1, drop=True)
+
 ################################################################
 
 ################################################################
@@ -274,5 +283,27 @@ def determine_injury_side(x):
                 assert False, "Injury to neither team??"
 
     return off_injury, off_players, def_injury, def_players
+
+def process_game_record(game):
+    '''
+    Function supporting the extraction of game features
+    :param game: Individual game record
+    :return: Game features
+    '''
+    
+    teams = [game['homeTeamAbbr'].values[0], game['visitorTeamAbbr'].values[0]]
+    scores = [game['homeScore'].values[0], game['visitorScore'].values[0]]
+    hasWon = [False, False]
+
+    if (game['whoWon'].values == game['homeTeamAbbr'].values):
+        hasWon[0] = True
+    else:
+        hasWon[1] = True
+
+    return pd.DataFrame({
+        'team': teams,
+        'gameScore': scores,
+        'hasWon': hasWon
+    })    
 
 ################################################################

@@ -14,6 +14,9 @@ from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib import animation
 from IPython.display import HTML
+from IPython import display
+
+from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
 
 # Figure visualization, inspired by https://www.kaggle.com/code/jaronmichal/tracking-data-visualization/notebook
 # De-parametrized it, setting the field to 100 x 53.3 yards 
@@ -294,3 +297,26 @@ def animateScores(scores, store_path=""):
         anim.save(store_path, writer=writer)
 
     return HTML(anim.to_html5_video())
+
+def visualize_play(week_data, gameId, playId, config):
+
+    # Full Pitch Evaluation
+    # Extract info from the play
+    team1, team2, ball = extractPlay(week_data, gameId, playId)
+
+    # Plot the play in Full Field
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPitch(), store_path=f"../videos/{gameId}_{playId}_fullPitch.mp4")
+    display.display(fig_field)
+    plt.close()
+
+    # Preprocess the play
+    team1, team2, ball = preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
+
+    # Plot the play in the Pocket
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
+    display.display(fig_field)
+    plt.close()
+
+    ###############################################################
+    # This function can be enhanced with plotting of the score    #
+    ###############################################################
