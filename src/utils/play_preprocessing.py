@@ -168,7 +168,8 @@ def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, post_snap_
     frameIds = ball.frameId.unique()
     for frame in frameIds:
         if frame > delay_frame:
-            qb_ref.loc[frame, ['x', 'y']] = qb_ref.loc[delay_frame, ['x', 'y']]
+            qb_ref.loc[qb_ref.frameId == frame, 'x'] = qb_ref.loc[qb_ref.frameId == delay_frame, 'x']
+            qb_ref.loc[qb_ref.frameId == frame, 'y'] = qb_ref.loc[qb_ref.frameId == delay_frame, 'y']
 
     # All coordinates are now placed referenced to the QB coordinates
     elements = [team1, team2, ball]

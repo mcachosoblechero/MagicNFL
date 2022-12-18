@@ -102,4 +102,4 @@ def calculate_grid_score(pixel_x, pixel_y, frameId, team_def, infl_funct, config
         )
 
     # At the end of this calculation, only maintain the maximum one
-    return frame_scores.max(axis=2)
+    return frame_scores.sum(axis=2)

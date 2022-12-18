@@ -323,7 +323,7 @@ def visualize_play(week_data, gameId, playId, config):
     team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
 
     # Plot the play in the Pocket
-    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(config['pocket_len']), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
     display.display(fig_field)
     plt.close()
 
