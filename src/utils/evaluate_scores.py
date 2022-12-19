@@ -16,11 +16,11 @@ from matplotlib import animation
 from IPython.display import HTML
 
 
-def evaluate_agg_scores(scores_file):
+def evaluate_season_scores(scores_file):
 
     """
     This function generates a set of analytic plots to correlate features and scores
-    This function accepts aggregated data both at the match and season level
+    This function accepts aggregated data at the season level
     :param scores_file: Path to the file with agg scores
     """
 
@@ -68,6 +68,154 @@ def evaluate_agg_scores(scores_file):
     plt.xlabel("Percentage QB Sacked")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % QB Sacked")
+
+    #################################################################
+    # Game Analysis
+    # Figure height and width
+    width = 30
+    height = 10
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 3
+    # Analysis 1 - Avg Pocket Score vs Cum Score
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumScore')
+    plt.xlabel("Cumulative Season Score")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Avg Pocket Score vs Cum Score")
+    # Analysis 2 - Avg Pocket Score vs Avg Score
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='avgScore')
+    plt.xlabel("Average Season Score")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Avg Pocket Score vs Avg Score")
+    # Analysis 3 - Avg Pocket Score vs Games Won
+    plt.subplot(rows,cols,3)
+    sns.violinplot(data=analysis_results, y='avgPocketScore', x='gamesWon')
+    plt.xlabel("Games Won")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Avg Pocket Score vs Games Won")
+
+    #################################################################
+    # Foul analysis
+    # Figure height and width
+    height = 10
+    width = 20
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 2
+    # Analysis 1 - Score vs Num Offensive Fouls
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='numOffFouls')
+    plt.xlabel("Number of Offensive Fouls")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Off Fouls")
+    # Analysis 2 - Score vs Num Defensive Fouls
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='numDefFouls')
+    plt.xlabel("Number of Defensive Fouls")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Def Fouls")
+    
+    #################################################################
+    # Injury analysis
+    # Figure height and width
+    height = 10
+    width = 20
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 2
+    # Analysis 1 - Score vs Num Offensive Injuries
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='numOffInjuries')
+    plt.xlabel("Number of Offensive Injuries")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Off Injuries")
+    # Analysis 2 - Score vs Num Defensive Injuries
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='numDefInjuries')
+    plt.xlabel("Number of Defensive Injuries")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Def Injuries")
+
+
+def evaluate_match_scores(scores_file):
+
+    """
+    This function generates a set of analytic plots to correlate features and scores
+    This function accepts aggregated data at the match level
+    :param scores_file: Path to the file with agg scores
+    """
+
+    # Load information based on the analysis provided
+    analysis_results = pd.read_csv(scores_file)
+    
+    #################################################################
+    # Run a set of analysis to explore the correlation between the score and the extracted features
+    #################################################################
+    # Play Outcome Analysis
+    # Figure height and width
+    width = 40
+    height = 10
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 5
+    # Analysis 1 - Score vs Cum Gained Yards
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
+    plt.xlabel("Cumulative Gained yards")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Cum Gained Yards")
+    # Analysis 2 - Score vs Avg Gained Yards
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='avgGainedYards')
+    plt.xlabel("Average Gained yards")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Avg Gained Yards")
+    # Analysis 3 - Score vs Pass complete
+    plt.subplot(rows,cols,3)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percPassComplete')
+    plt.xlabel("Percentage Complete Passes")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % Complete pass")
+    # Analysis 4 - Score vs Pocket hold
+    plt.subplot(rows,cols,4)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percPocketHold')
+    plt.xlabel("Percentage Pocket hold")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % Pocket hold")
+    # Analysis 5 - Score vs Pocket hold
+    plt.subplot(rows,cols,5)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
+    plt.xlabel("Percentage QB Sacked")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % QB Sacked")
+
+    #################################################################
+    # Game Analysis
+    # Figure height and width
+    width = 20
+    height = 10
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 2
+    # Analysis 1 - Score vs Gained Yards
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='gameScore')
+    plt.xlabel("Game Score")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Avg Pocket Score vs Game Score")
+    # Analysis 2 - Score vs Pass complete
+    plt.subplot(rows,cols,2)
+    sns.violinplot(data=analysis_results, y='avgPocketScore', x='wonGame')
+    plt.xlabel("Did the team won the game?")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Avg Pocket Score vs Game Result")
 
     #################################################################
     # Foul analysis
@@ -238,3 +386,74 @@ def evaluate_singleplay_scores(scores_file):
     plt.xlabel("Number of Defensive Injuries")
     plt.ylabel("Pocket Score")
     plt.title("Score vs Def Injuries")
+
+def evaluate_time_series_score(play_scores_and_features):
+
+    """
+    Generate a set of plots describing the time series evolution of a pocket score
+    :param play_scores_and_features: Information extracted from Pocket analysis
+    """
+
+    # Display score time series 
+    # Analyze - Raw Pocket Score
+    plt.figure(figsize=(8,6))
+    legend_labels = []
+    for play_score in play_scores_and_features.iterrows():
+        plt.plot(play_score[1].pocketScoreTimeSeries)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Raw Pocket Score Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Pass Complete
+    plt.figure(figsize=(8,6))
+    legend_labels = []
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].pass_complete == True:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Pass Complete Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Has Pocket Hold
+    plt.figure(figsize=(8,6))
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].has_pocket_hold == True:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Has Pocket Hold? Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Has Pocket Hold
+    plt.figure(figsize=(8,6))
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].was_qb_sacked == False:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Was QB sacked? Analysis")
+    plt.legend(legend_labels)
+    plt.show()

@@ -61,10 +61,13 @@ def extract_formation_features(plays_data):
     # WR -> ???? - Need to check
     # TE -> ???? - Need to check
     # OL -> Offensive Lineman? - Need to check
+    num_wr = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d WR')
+    num_qb = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d QB')
     play_formation['num_rb'] = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d RB')
-    play_formation['num_wr'] = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d WR')
+    play_formation['num_wr'] = num_wr
     play_formation['num_te'] = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d TE')
-    play_formation['num_ol'] = plays_data.personnelO.astype(str).apply(extract_number_players_regexp, pattern='\d OL')
+    play_formation['num_qb'] = num_qb
+    play_formation['num_ol'] = 11 - num_wr - num_qb
     # Note - Would we obtain the same result if we check the players position? 
 
     # Extract the offense formation used
