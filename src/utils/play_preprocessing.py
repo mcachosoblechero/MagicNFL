@@ -201,8 +201,6 @@ def preprocessPlay_refQB_NFrames(team1, team2, ball, delay_frame = 6, post_snap_
         if frame > delay_frame:
             qb_ref.loc[qb_ref.frameId == frame, 'x'] = qb_ref_delay_frame.x.values[0]
             qb_ref.loc[qb_ref.frameId == frame, 'y'] = qb_ref_delay_frame.y.values[0]
-    print(qb_ref)
-
 
     # All coordinates are now placed referenced to the QB coordinates
     elements = [team1, team2, ball]
