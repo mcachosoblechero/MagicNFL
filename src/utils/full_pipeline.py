@@ -91,7 +91,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
         # Calculate scores
         pocketScoreTimeSeries = calculate_score(players_influence, field_price)
-        pocketScore = np.average(pocketScoreTimeSeries)
+        pocketScore = np.max(pocketScoreTimeSeries)
         ############################################################
 
         all_scores_info.append({
@@ -198,7 +198,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
             field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
             # Calculate scores
-            pocketScore = np.average(calculate_score(players_influence, field_price))
+            pocketScore = np.max(calculate_score(players_influence, field_price))
             ############################################################
             # For now, we will include random values
             # pocketScore = random.uniform(0, 1)
