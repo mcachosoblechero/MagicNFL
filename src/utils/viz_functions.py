@@ -335,6 +335,7 @@ def visualize_play(week_data, gameId, playId, config):
         config=config
     )
 
+    print("here")
     # Plot the play
     fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.mp4")
     display.display(fig_influence)
