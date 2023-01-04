@@ -58,12 +58,12 @@ def preprocessPlay_refLineScrimmageInit(team1, team2, ball, delay_frame = 6, pos
     :return ball: DataFrame with normalized info regarding the ball, based on the initial position of the ball
     """
 
-    # Extract ball initial position
+    # Extract ball initial position - I need to parametrize this!
     initial_y = ball.loc[ball.frameId == 1, 'y'].values.flatten()
     if ball.playDirection.values[0] == "left":
-        initial_x = ball.loc[ball.frameId == 1, 'x'].values.flatten() + 5
+        initial_x = ball.loc[ball.frameId == 1, 'x'].values.flatten() + 7.5
     else:
-        initial_x = ball.loc[ball.frameId == 1, 'x'].values.flatten() - 5
+        initial_x = ball.loc[ball.frameId == 1, 'x'].values.flatten() - 7.5
 
     # All coordinates are now placed referenced to these coordinates
     elements = [team1, team2, ball]

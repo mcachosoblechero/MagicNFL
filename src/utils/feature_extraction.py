@@ -167,6 +167,38 @@ def extract_game_features(games_data):
 
     return games_data.groupby(['gameId']).apply(process_game_record).reset_index(level=1, drop=True)
 
+def extract_plays_features(input_path):
+    """
+    Function to extract features associated with the plays
+    :param input_path: Path to raw data
+    :return: DataFrame with gameId, playId and associated data
+    """
+
+    # Define number of weeks to analyize
+    num_weeks = 8
+
+    # Generate files names
+    week_files = []
+    for i in range(num_weeks):
+        week_files.append(f'week{i+1}.csv')
+
+    # For all weeks, extract scores
+    all_plays_length = []
+    for week_file in week_files:
+
+        # Load information for an entire week
+        week_data = pd.read_csv(os.path.join(input_path, week_file))
+
+        # Obtain the play length information
+        play_length = week_data.groupby(['gameId', 'playId']).apply(calculate_total_play_time)
+        pass_time_length = week_data.groupby(['gameId', 'playId']).apply(calculate_time_to_pass)
+        all_plays_length.append(pd.DataFrame({
+            'play_length': play_length,
+            'time_to_pass': pass_time_length
+        }))
+
+    return pd.concat(all_plays_length, axis=0)
+
 ################################################################
 
 ################################################################
@@ -308,5 +340,45 @@ def process_game_record(game):
         'gameScore': scores,
         'hasWon': hasWon
     })    
+
+def calculate_total_play_time(play):
+    '''
+    Function supporting the extraction of play time
+    :param game: Individual play record
+    :return: Play time
+    '''
+
+    # Time to Play End
+    time_to_end = max(play.frameId * 0.1)
+    # Time to Play Snap
+    time_to_snap = play.loc[play.event == "ball_snap", 'frameId']
+    if time_to_snap.empty:
+        time_to_snap = 0
+    else:
+        time_to_snap = time_to_snap.values[0] * 0.1
+
+    return time_to_end - time_to_snap
+
+def calculate_time_to_pass(play):
+    '''
+    Function supporting the extraction of time to pass
+    :param game: Individual play record
+    :return: Time to Pass
+    '''
+
+    # Time to Play Pass
+    time_to_pass = play.loc[play.event == "pass_forward", 'frameId']
+    if time_to_pass.empty:
+        return None
+    else:
+        time_to_pass = time_to_pass.values[0] * 0.1
+    
+    # Time to Play Snap
+    time_to_snap = play.loc[play.event == "ball_snap", 'frameId']
+    if time_to_snap.empty:
+        time_to_snap = 0
+    else:
+        time_to_snap = time_to_snap.values[0] * 0.1
+    return time_to_pass - time_to_snap
 
 ################################################################
