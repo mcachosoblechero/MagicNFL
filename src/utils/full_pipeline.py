@@ -94,7 +94,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
         pocketScore = np.max(pocketScoreTimeSeries)
 
         # Calculate QB score
-        QB_OOP_Score = calculate_qb_score(team1, config)
+        QB_OOP_Score = calculate_qb_score(team1, ball, input_path, config)
         pocketScore += QB_OOP_Score
         ############################################################
 
@@ -206,7 +206,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
             pocketScore = np.max(pocketScoreTimeSeries)
 
             # Calculate QB score
-            QB_OOP_Score = calculate_qb_score(team1, config)
+            QB_OOP_Score = calculate_qb_score(team1, ball, input_path, config)
             pocketScore += QB_OOP_Score
 
             ############################################################
