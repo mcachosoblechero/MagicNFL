@@ -21,7 +21,7 @@ from matplotlib import animation
 from IPython.display import HTML
 from IPython import display
 
-def calculate_score(players_influence, field_price):
+def calculate_defense_score(players_influence, field_price):
 
     """
     Calculate score based on the players influence and field price.
@@ -32,3 +32,11 @@ def calculate_score(players_influence, field_price):
     """
 
     return np.sum(np.sum(np.multiply(players_influence, field_price), axis=2), axis=1)
+
+
+def calculate_qb_score(team1, config):
+    """
+    Calculate the additional score due to QB being outside the pocket 
+    """
+
+    return 0

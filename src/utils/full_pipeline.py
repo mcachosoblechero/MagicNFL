@@ -24,7 +24,7 @@ from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
 from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores, evaluate_time_series_score
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
-from src.utils.calculate_score import calculate_score
+from src.utils.calculate_score import calculate_defense_score, calculate_qb_score
 
 def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"):
     """
@@ -89,9 +89,13 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
         # Extract field price
         field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
-        # Calculate scores
-        pocketScoreTimeSeries = calculate_score(players_influence, field_price)
+        # Calculate defensive scores
+        pocketScoreTimeSeries = calculate_defense_score(players_influence, field_price)
         pocketScore = np.max(pocketScoreTimeSeries)
+
+        # Calculate QB score
+        QB_OOP_Score = calculate_qb_score(team1, config)
+        pocketScore += QB_OOP_Score
         ############################################################
 
         all_scores_info.append({
@@ -197,8 +201,14 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
             # Extract field price
             field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
-            # Calculate scores
-            pocketScore = np.max(calculate_score(players_influence, field_price))
+            # Calculate defensive scores
+            pocketScoreTimeSeries = calculate_defense_score(players_influence, field_price)
+            pocketScore = np.max(pocketScoreTimeSeries)
+
+            # Calculate QB score
+            QB_OOP_Score = calculate_qb_score(team1, config)
+            pocketScore += QB_OOP_Score
+
             ############################################################
             # For now, we will include random values
             # pocketScore = random.uniform(0, 1)
