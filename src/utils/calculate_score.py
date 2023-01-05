@@ -36,7 +36,10 @@ def calculate_defense_score(players_influence, field_price):
 
 def calculate_qb_score(team1, config):
     """
-    Calculate the additional score due to QB being outside the pocket 
+    Calculate the additional score due to QB being outside the pocket
+    :param team1: Information regarding team 1
+    :param config: Run parameters
+    :return: QB OOP Score
     """
 
     return 0
