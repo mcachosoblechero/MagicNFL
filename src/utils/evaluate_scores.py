@@ -308,6 +308,12 @@ def evaluate_singleplay_scores(scores_file):
     plt.xlabel("Was QB sacked?")
     plt.ylabel("Pocket Score")
     plt.title("Score vs QB Sacked")
+    # Analysis 4 - Score vs QB IN Pocket
+    plt.subplot(rows,cols,4)
+    sns.violinplot(data=analysis_results, y='pocketScore', x='did_qb_stay_in_pocket')
+    plt.xlabel("Did QB Stay in the Pocket?")
+    plt.ylabel("Pocket Score")
+    plt.title("Score vs Did QB Stay In Pocket?")
     
     #################################################################
     # Formation analysis
@@ -455,5 +461,22 @@ def evaluate_time_series_score(play_scores_and_features):
     plt.xlabel("FrameId")
     plt.ylabel("Pocket Score")
     plt.title("Was QB sacked? Analysis")
+    plt.legend(legend_labels)
+    plt.show()
+
+    # Analyze - Pocket Score vs Has Pocket Hold
+    plt.figure(figsize=(8,6))
+    for play_score in play_scores_and_features.iterrows():
+        if play_score[1].did_qb_stay_in_pocket == False:
+            colour = "seagreen"
+        else:
+            colour = "lightcoral"
+        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+
+    plt.xlabel("FrameId")
+    plt.ylabel("Pocket Score")
+    plt.title("Did QB Remain in Pocket? Analysis")
     plt.legend(legend_labels)
     plt.show()

@@ -27,6 +27,7 @@ from src.utils.field_price_functions import calculate_field_price, gaussian_fiel
 from src.utils.calculate_score import calculate_score
 
 def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"):
+
     """
     This function performs all operations required for the pipeline execution, limited to a provided plays. 
     All operations are parametrized through CONFIG
@@ -57,18 +58,19 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
     # Extract whether qb stayed in pocket for a single play
     plays_qb_in_pocket = pd.DataFrame()
+
     for weekId, gameId, playId in (plays):
        # Load information for an entire week
         week_data = \
             pd.read_csv(os.path.join(input_path, weekId))\
             .query(f"gameId=={gameId} and playId=={playId}")
 
-        did_qb_stay_in_pocket=extract_did_qb_stay_in_pocket(week_data, player_data, config)
-
-        plays_qb_in_pocket=pd.concat([plays_qb_in_pocket, did_qb_stay_in_pocket]).set_index(['gameId', 'playId'])
+        plays_qb_in_pocket= \
+            pd.concat([plays_qb_in_pocket, 
+                       extract_did_qb_stay_in_pocket(week_data, player_data, config)])
         
-
-
+    plays_qb_in_pocket=plays_qb_in_pocket.set_index(['gameId', 'playId'])      
+ 
     # Perform all play feature extractions
     plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
     plays_formation = extract_formation_features(plays_data).set_index(['gameId', 'playId'])
@@ -77,6 +79,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
     # Merge all these tables into one single big table
     play_features = pd.concat([plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1)
+
     play_features.to_csv(play_features_file)
 
     # Load information regarding games
@@ -122,7 +125,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
     # Merge scores with play features
     scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
-    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1, join="inner")
+    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1, join="inner")
     play_scores_and_features.to_csv(scores_and_features_file)
     ##########################################
 
