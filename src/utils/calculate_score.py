@@ -38,6 +38,7 @@ def calculate_defense_score(players_influence, field_price):
 def calculate_qb_score(team1, ball, input_path, config):
     """
     Calculate the additional score due to QB being outside the pocket
+    This score adds penalty scores for every frame the QB is outside of the pocket
     :param team1: Information regarding team 1
     :param config: Run parameters
     :return: QB OOP Score
@@ -46,7 +47,7 @@ def calculate_qb_score(team1, ball, input_path, config):
     # Determine the pocket size
     pocket_pos_length = (config['pocket_len']/2)
 
-    # Extract which team from the offensive team is the QB
+    # Extract which team member from the offensive team is the QB
     # - Obtain list of players
     list_players = team1.nflId.unique().tolist()
     # - Extract QB ID
