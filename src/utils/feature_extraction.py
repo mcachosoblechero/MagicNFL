@@ -167,6 +167,31 @@ def extract_game_features(games_data):
 
     return games_data.groupby(['gameId']).apply(process_game_record).reset_index(level=1, drop=True)
 
+def extract_did_qb_stay_in_pocket(week_data, player_data, config):
+    qb_escape_data = \
+        (player_data\
+            .set_index("nflId")\
+            .join(week_data.set_index("nflId"), how="right")\
+            .query("(officialPosition == 'QB' or team == 'football')")\
+            .groupby(['gameId', 'playId'])
+            )
+
+
+    gameId = []
+    playId = []
+    values = []
+
+    for name, play_df in qb_escape_data:
+        gameId.append(name[0])
+        playId.append(name[1])
+        values.append(did_qb_stay_in_pocket(play_df, config))
+
+    data = \
+        {'gameId': gameId,
+        'playId': playId,
+        'did_qb_stay_in_pocket': values}
+
+    return(pd.DataFrame(data))
 ################################################################
 
 ################################################################
@@ -308,5 +333,98 @@ def process_game_record(game):
         'gameScore': scores,
         'hasWon': hasWon
     })    
+
+def find_pocket_limits(play_df, config):
+
+    """ 
+    Takes position-level dataframe and returns the limits for pockets
+    Performs the following actions
+    1 - Extract football location in first frame
+    2 - calculates x-limits for pocket based on playDirection and pocket_len
+    3 - calculates y-limits for pocket based on pocket_len
+    :param play_df: dataframe for a single play containing position-level data
+    :param config: parameterized pipeline inputs.  Specifically uses the pocket_len parameter 
+    """
+
+
+    football_info = play_df.loc[(play_df['frameId']==1) & (play_df['team']=='football'), ['x','y', 'playDirection']]
+    
+
+    if football_info['playDirection'].values[0]=="right":
+        xlims=(football_info['x'].values[0]-config["pocket_len"], football_info['x'].values[0])
+    else:
+        xlims=(football_info['x'].values[0], football_info['x'].values[0]+config["pocket_len"])
+
+    ylims=(football_info['y'].values[0]-config["pocket_len"]/2, football_info['y'].values[0]+config["pocket_len"]/2)
+
+    return(xlims, ylims)
+
+class pocket_limits:
+
+    """ 
+    Class to house pocket limits
+    Contains the following functions
+    1- is_inside_x: -> Bool 
+            using the xlimits, tests whether a given x-value is inside or outside the range
+    2- is_inside_y: -> Bool
+            using the y-limits, tests whether a given y-value is inside or outside the range
+    3- is_point_inside_pocket: -> Bool
+            tests whether a given point is inside or outside of the square defined by xlims, ylims
+    """
+
+    def __init__(self, xlims, ylims):
+        self.x_lower=xlims[0]
+        self.x_upper=xlims[1]
+        self.y_lower=ylims[0]
+        self.y_upper=ylims[1]
+    
+    def is_inside_x(self, x_value):
+        return(x_value<self.x_upper and x_value>self.x_lower)
+        
+    def is_inside_y(self, y_value):
+        return(y_value<self.y_upper and y_value>self.y_lower)
+
+    def is_point_inside_pocket(self, x_value, y_value):
+        return(self.is_inside_x(x_value) and self.is_inside_y(y_value))
+
+def did_qb_stay_in_pocket(play_df, config):
+
+    """ 
+    function that determines whether a quarterback stayed inside the pocket prior to throwing the football
+    Performs the following operations
+    1- calculate the pocket limits based on the value of the football in frame one (via find_pocket_limts)
+        instantiate a play_pocket object to store the limits
+    2- For each observation in play_df, determine whether the player was inside the pocket
+        pocket size parameterized by config parameter
+    3- finds frame where the pass was thrown
+        - takes minimum frameId for event in [pass_forward, autoevent_passforward]
+        - if no passforward event occurs, returns maximum frameId for play
+    4- checks whether the QB was in the pocket for all pre-pass frames
+
+    :param play_df: 
+    :param config:parameterized pipeline inputs.  Specifically uses the pocket_len parameter 
+    """
+
+    ## Find Pocket Limits
+    xlims, ylims=find_pocket_limits(play_df, config)
+    play_pocket=pocket_limits(xlims, ylims)
+
+
+    play_df['is_currently_in_pocket']=[play_pocket.is_point_inside_pocket(x,y) for x, y in zip(play_df["x"], play_df["y"])]
+
+    ## Find Pass FrameId 
+    prepass_frames = play_df.loc[play_df['event'].isin(["pass_forward", 'autoevent_passforward']), 'frameId']    
+
+    if prepass_frames.shape[0]>0:
+        frame_of_pass=min(prepass_frames)
+    else:
+        frame_of_pass=max(play_df['frameId'])
+
+
+    # Check whether QB was always in pocket before pass was thrown
+    qb_stayed_in_pocket = min(play_df.loc[(play_df['frameId']<=frame_of_pass) & (play_df['officialPosition']=='QB'), 'is_currently_in_pocket'])    
+        
+    
+    return(qb_stayed_in_pocket)
 
 ################################################################
