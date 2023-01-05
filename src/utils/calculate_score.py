@@ -35,12 +35,14 @@ def calculate_defense_score(players_influence, field_price):
     return np.sum(np.sum(np.multiply(players_influence, field_price), axis=2), axis=1)
 
 
-def calculate_qb_score(team1, ball, input_path, config):
+def calculate_qb_score(team1, ball, config, input_path = "../input/"):
     """
     Calculate the additional score due to QB being outside the pocket
-    This score adds penalty scores for every frame the QB is outside of the pocket
+    This score is calculated fror each frame
     :param team1: Information regarding team 1
+    :param ball: Information regarding ball
     :param config: Run parameters
+    :param input_path: Path to the input files
     :return: QB OOP Score
     """
 
@@ -76,7 +78,7 @@ def calculate_qb_score(team1, ball, input_path, config):
     qb_ref = team1.loc[team1.nflId == qb_id, ['frameId', 'x', 'y']]
 
     # Determine whether QB is Out-of-Pocket (OOP)
-    qb_oop_score = 0
+    qb_oop_scores = []
     frameIds = ball.frameId.unique()
     for frameId in frameIds:
         ref_x, ref_y = qb_ref.loc[qb_ref.frameId == frameId, ['x', 'y']].values[0]
@@ -85,6 +87,8 @@ def calculate_qb_score(team1, ball, input_path, config):
         # If QB is OOP, add QB OOP score
         if (dist_to_center > pocket_pos_length):
             dist_outside_pocket = dist_to_center - pocket_pos_length
-            qb_oop_score += config['qb_oop_infl_funct'](dist_outside_pocket, config)
-    
-    return qb_oop_score
+            qb_oop_scores.append(config['qb_oop_infl_funct'](dist_outside_pocket, config))
+        else:
+            qb_oop_scores.append(0.0)
+
+    return np.array(qb_oop_scores)

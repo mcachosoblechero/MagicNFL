@@ -90,12 +90,16 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
         field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
         # Calculate defensive scores
-        pocketScoreTimeSeries = calculate_defense_score(players_influence, field_price)
-        pocketScore = np.max(pocketScoreTimeSeries)
+        defence_score = calculate_defense_score(players_influence, field_price)
 
         # Calculate QB score
-        QB_OOP_Score = calculate_qb_score(team1, ball, input_path, config)
-        pocketScore += QB_OOP_Score
+        QB_OOP_Score = calculate_qb_score(team1, ball, config, input_path)
+
+        # Adds both scores
+        pocketScoreTimeSeries = defence_score + QB_OOP_Score
+
+        # Calculate the final score
+        pocketScore = np.max(pocketScoreTimeSeries)
         ############################################################
 
         all_scores_info.append({
@@ -202,12 +206,16 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
             field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
             # Calculate defensive scores
-            pocketScoreTimeSeries = calculate_defense_score(players_influence, field_price)
-            pocketScore = np.max(pocketScoreTimeSeries)
+            defence_score = calculate_defense_score(players_influence, field_price)
 
             # Calculate QB score
-            QB_OOP_Score = calculate_qb_score(team1, ball, input_path, config)
-            pocketScore += QB_OOP_Score
+            QB_OOP_Score = calculate_qb_score(team1, ball, config, input_path)
+
+            # Adds both scores
+            pocketScoreTimeSeries = defence_score + QB_OOP_Score
+
+            # Calculate the final score
+            pocketScore = np.max(pocketScoreTimeSeries)
 
             ############################################################
             # For now, we will include random values
