@@ -19,7 +19,7 @@ from IPython.display import HTML
 from IPython import display
 
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
-from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features
+from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features, extract_did_qb_stay_in_pocket
 from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
 from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores, evaluate_time_series_score
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
@@ -51,6 +51,24 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Load information regarding plays
     plays_data = pd.read_csv(os.path.join(input_path, 'plays.csv'))
 
+    # Extract whether qb stayed in pocket for a single play
+    plays_qb_in_pocket = pd.DataFrame()
+
+    # Load information regarding players -- for did_qb_stay_in_pocket
+    player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
+
+    for weekId, gameId, playId in (plays):
+    # Load information for an entire week
+        week_data = \
+            pd.read_csv(os.path.join(input_path, weekId))\
+            .query(f"gameId=={gameId} and playId=={playId}")
+
+        plays_qb_in_pocket= \
+            pd.concat([plays_qb_in_pocket, 
+                    extract_did_qb_stay_in_pocket(week_data, player_data, config)])
+        
+    plays_qb_in_pocket=plays_qb_in_pocket.set_index(['gameId', 'playId'])
+
     # Perform all play feature extractions
     plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
     plays_formation = extract_formation_features(plays_data).set_index(['gameId', 'playId'])
@@ -58,7 +76,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     plays_injury = extract_injury_features(plays_data).set_index(['gameId', 'playId'])
 
     # Merge all these tables into one single big table
-    play_features = pd.concat([plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
+    play_features = pd.concat([plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1)
     play_features.to_csv(play_features_file)
 
     # Load information regarding games
@@ -112,7 +130,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
 
     # Merge scores with play features
     scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
-    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1, join="inner")
+    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1, join="inner")
     play_scores_and_features.to_csv(scores_and_features_file)
     ##########################################
 
