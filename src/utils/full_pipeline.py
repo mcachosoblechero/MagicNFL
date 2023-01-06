@@ -26,7 +26,7 @@ from src.utils.player_influence import extract_play_players_influence, gaussian_
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_defense_score, calculate_qb_score
 
-def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"):
+def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots = True, runId = "generic"):
     """
     This function performs all operations required for the pipeline execution, limited to a provided plays. 
     All operations are parametrized through CONFIG
@@ -38,6 +38,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     :param plays: List of (weekId, gameId, playId) to analyze
     :param output_path: Path for processed datasets
     :param config: Run Parameters
+    :param timeseries_plots: Boolean determining whether to plot the individual time series
     :param runId: ID to identify each run 
     """
 
@@ -154,7 +155,8 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     evaluate_singleplay_scores(scores_and_features_file)
 
     # Extract information regarding Score Time Series
-    evaluate_time_series_score(play_scores_and_features)
+    if timeseries_plots:
+        evaluate_time_series_score(play_scores_and_features)
     ##########################################
 
 def run_full_pipeline(input_path, output_path, config, runId = "generic"):
