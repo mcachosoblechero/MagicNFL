@@ -57,7 +57,8 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Load information regarding players -- for did_qb_stay_in_pocket
     player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
 
-    for weekId, gameId, playId in (plays):
+    print("Preprocessing features...")
+    for weekId, gameId, playId in tqdm.tqdm(plays):
     # Load information for an entire week
         week_data = \
             pd.read_csv(os.path.join(input_path, weekId))\
@@ -91,6 +92,7 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # STEP 2 - PREPROCESS ALL PLAYS          #
     ##########################################
     all_scores_info = []
+    print("Processing plays...")
     for weekId, gameId, playId in tqdm.tqdm(plays):
 
         # Load information for an entire week

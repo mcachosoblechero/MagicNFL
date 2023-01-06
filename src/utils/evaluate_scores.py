@@ -283,7 +283,7 @@ def evaluate_singleplay_scores(scores_file):
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 1
-    cols = 4
+    cols = 5
     # Analysis 1 - Score vs Gained Yards
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='pocketScore', x='gained_yards')
@@ -308,6 +308,12 @@ def evaluate_singleplay_scores(scores_file):
     plt.xlabel("Was QB sacked?")
     plt.ylabel("Pocket Score")
     plt.title("Score vs QB Sacked")
+    # Analysis 5 - Score vs QB Out of Pocket
+    plt.subplot(rows,cols,5)
+    sns.violinplot(data=analysis_results, y='pocketScore', x='did_qb_stay_in_pocket')
+    plt.xlabel("Did QB stay in pocket?")
+    plt.ylabel("Pocket Score")
+    plt.title("Score vs QB Stay in Pocket")
     
     #################################################################
     # Formation analysis
@@ -461,7 +467,7 @@ def evaluate_time_series_score(play_scores_and_features):
     # Analyze - Pocket Score vs Has QB remained in Pocket
     plt.figure(figsize=(8,6))
     for play_score in play_scores_and_features.iterrows():
-        if play_score[1].did_qb_stay_in_pocket == False:
+        if play_score[1].did_qb_stay_in_pocket == True:
             colour = "seagreen"
         else:
             colour = "lightcoral"

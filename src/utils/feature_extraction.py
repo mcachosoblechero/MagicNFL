@@ -445,7 +445,7 @@ class pocket_limits:
             tests whether a given point is inside or outside of the square defined by xlims, ylims
     """
 
-    def _init_(self, xlims, ylims):
+    def __init__(self, xlims, ylims):
         self.x_lower=xlims[0]
         self.x_upper=xlims[1]
         self.y_lower=ylims[0]
