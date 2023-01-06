@@ -22,6 +22,21 @@ from IPython.display import HTML
 from IPython import display
 
 
+# Function applied to players - Gaussian Distribution function
+def gaussian_oop_influence_score(player_pos, config):
+
+    '''
+    This function calculates the QB influence when Out-of-Pocket (OOP)
+    :param player_pos: Player X (QB) position outside the pocket 
+    :param config: Run Parameters 
+    :return: Player influence value
+    '''
+
+    # Calculate Gaussian Distribution
+    Z = config['qb_oop_penalty'] * (1-np.exp(-( (player_pos-config['gaus_oop_mu'])**2 / ( 2.0 * config['gaus_oop_sigma']**2 ) ) ))
+    
+    return Z
+
 def gaussian_player_influence_score(player_x, player_y, pixel_x, pixel_y, config):
 
     '''

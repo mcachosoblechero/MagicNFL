@@ -19,6 +19,7 @@ from IPython import display
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
 from src.utils.field_price_functions import calculate_field_price
+from src.utils.calculate_score import calculate_defense_score, calculate_qb_score
 
 # Figure visualization, inspired by https://www.kaggle.com/code/jaronmichal/tracking-data-visualization/notebook
 # De-parametrized it, setting the field to 100 x 53.3 yards 
@@ -171,8 +172,9 @@ def drawPocket(width = 30):
 
     ###################
     # Create a set of rectangle - Playable pitch + 2 endzones (10 yards)
-    rect = plt.Rectangle((-width/2, -width/2), width, width, ec="w", fc="None", lw=2)
-    ax.add_patch(rect)
+    # pocket = plt.Rectangle((-width/2, -width/2), width, width, ec="w", fc="None", lw=2)
+    pocket = plt.Circle(xy=(0,0), radius=width/2,ec="w", fc="None", lw=2)
+    ax.add_patch(pocket)
     ###################
 
     ###################
@@ -343,11 +345,16 @@ def visualize_play(week_data, gameId, playId, config):
     # Analyze the score timeline
     # Extract field price
     field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
-    # Calculate frames score
-    frames_scores = np.sum(np.sum(np.multiply(player_infl, field_price), axis=2), axis=1)
+
+    # Calculate defensive scores
+    pocketScoreTimeSeries = calculate_defense_score(player_infl, field_price)
+
+    # Calculate QB score
+    QB_OOP_Score = calculate_qb_score(team1, ball, config)
+
     # Plot frame scores
     plt.figure(figsize=(8,5))
-    plt.plot(frames_scores)
+    plt.plot(pocketScoreTimeSeries + QB_OOP_Score)
     plt.title("Score over time")
     plt.xlabel("Frames")
     plt.ylabel("Pocket Score")
