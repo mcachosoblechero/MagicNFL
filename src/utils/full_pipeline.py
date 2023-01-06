@@ -93,6 +93,11 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     ##########################################
     all_scores_info = []
     print("Processing plays...")
+
+    ############################################################
+    # FIND UNIQUE WEEKS
+    # LOAD DATA FOR THAT WEEK
+    ############################################################
     for weekId, gameId, playId in tqdm.tqdm(plays):
 
         # Load information for an entire week
@@ -101,6 +106,11 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
         # Extract info from the play
         team1, team2, ball = extractPlay(week_data, gameId, playId)
         team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
+
+        ############################################################
+        # Extract Play features - Is QB OOP?
+        # BRYCE ADD CODE HERE
+        ############################################################
 
         ############################################################
         # Extract player influence
@@ -127,7 +137,8 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
             'playId': playId,
             'offTeam': team1.team.drop_duplicates().values[0],
             'pocketScore': pocketScore,
-            'pocketScoreTimeSeries': pocketScoreTimeSeries
+            'pocketScoreTimeSeries': pocketScoreTimeSeries,
+            # BRYCE ADD ASSOCIATED FEATURE HERE #
         })
 
     # Merge scores with play features
