@@ -65,9 +65,9 @@ def evaluate_season_scores(scores_file):
     # Analysis 5 - Score vs Pocket hold
     plt.subplot(rows,cols,5)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
-    plt.xlabel("Percentage Linemen Fail")
+    plt.xlabel("Percentage Off Linemen Fail")
     plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % QB Sacked")
+    plt.title("Score vs % Off Linemen Failed Sacked")
 
     #################################################################
     # Game Analysis
@@ -176,12 +176,12 @@ def evaluate_match_scores(scores_file):
     plt.xlabel("Percentage QB Sacked")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % QB Sacked")
-    # Analysis 3 - Score vs Pocket hold
+    # Analysis 3 - Score vs Off Linemen Failed
     plt.subplot(rows,cols,3)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
-    plt.xlabel("Percentage Linemen Fail")
+    plt.xlabel("Percentage Off Linemen Fail")
     plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % QB Sacked")
+    plt.title("Score vs % Off Linemen Failed Sacked")
     # Analysis 4 - Score vs Cum Gained Yards
     plt.subplot(rows,cols,4)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
@@ -400,6 +400,53 @@ def evaluate_time_series_score(play_scores_and_features):
     Generate a set of plots describing the time series evolution of a pocket score
     :param play_scores_and_features: Information extracted from Pocket analysis
     """
+
+    # Convert DataFrame to unrolled version for time series
+    timeseries = []
+    for play_score in play_scores_and_features.iterrows():
+        for idx, timepoint in enumerate(play_score[1].pocketScoreTimeSeries):
+            timeseries.append({
+                'frameId': idx,
+                'frameValue': timepoint,
+                'achieved_pos_yards': play_score[1].achieved_pos_yards,
+                "was_qb_sacked": play_score[1].was_qb_sacked,
+                "did_qb_stay_in_pocket": play_score[1].did_qb_stay_in_pocket,
+                "have_linemen_failed": play_score[1].have_linemen_failed
+            })
+
+    df_timeseries = pd.DataFrame(timeseries)
+
+    # Have Linemen Failed? Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='have_linemen_failed', ci=95)
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis - Have Linemen Failed?")
+    plt.legend()
+    plt.show()
+
+    # Did QB stay in pocket? Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='did_qb_stay_in_pocket', ci=95)
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis - Did QB stay in pocket?")
+    plt.legend()
+    plt.show()
+
+    # Was QB Sacked? Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='was_qb_sacked', ci=95)
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis - Was QB sacked?")
+    plt.legend()
+    plt.show()
+
+    # Achieved Pos Yards Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='achieved_pos_yards', ci=95)
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis - Has achieved positive yards?")
+    plt.legend()
+    plt.show()
 
     # # Display score time series 
     # # Analyze - Raw Pocket Score
