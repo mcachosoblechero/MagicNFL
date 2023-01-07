@@ -35,7 +35,7 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     2- Process provided plays and extract their pocket scores
     3- Correlate features with pocket score
     :param input_path: Input path to raw data
-    :param plays: List of (weekId, gameId, playId) to analyze
+    :param plays: Dataframe of (weekId, gameId, playId) to analyze
     :param output_path: Path for processed datasets
     :param config: Run Parameters
     :param timeseries_plots: Boolean determining whether to plot the individual time series
@@ -56,22 +56,6 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
 
     # Extract whether qb stayed in pocket for a single play
     plays_qb_in_pocket = pd.DataFrame()
-
-    # Load information regarding players -- for did_qb_stay_in_pocket
-    player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
-
-    print("Preprocessing features...")
-    for weekId, gameId, playId in tqdm.tqdm(plays):
-    # Load information for an entire week
-        week_data = \
-            pd.read_csv(os.path.join(input_path, weekId))\
-            .query(f"gameId=={gameId} and playId=={playId}")
-
-        plays_qb_in_pocket= \
-            pd.concat([plays_qb_in_pocket, 
-                    extract_did_qb_stay_in_pocket(week_data, player_data, config)])
-        
-    plays_qb_in_pocket=plays_qb_in_pocket.set_index(['gameId', 'playId'])
 
     # Perform all play feature extractions
     plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
@@ -94,63 +78,66 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     ##########################################
     # STEP 2 - PREPROCESS ALL PLAYS          #
     ##########################################
-    all_scores_info = []
-    print("Processing plays...")
+    # Load information regarding players -- for did_qb_stay_in_pocket
+    player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
 
-    ############################################################
-    # FIND UNIQUE WEEKS
-    # LOAD DATA FOR THAT WEEK
-    ############################################################
-    for weekId, gameId, playId in tqdm.tqdm(plays):
+    scores=pd.DataFrame()
 
+    for weekId, play_df in plays.groupby('weekId'):
+        
+        all_scores_info = []
+        print(f"-> Processing {weekId}")
+        
         # Load information for an entire week
         week_data = pd.read_csv(os.path.join(input_path, weekId))
+        plays_qb_in_pocket= extract_did_qb_stay_in_pocket(week_data, player_data, config).set_index(['gameId', 'playId'])
 
-        # Extract info from the play
-        team1, team2, ball = extractPlay(week_data, gameId, playId)
-        team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
+        for weekId, gameId, playId in tqdm.tqdm(plays.query(f"weekId=='{weekId}'").values):
+            #print([gameId])
 
-        ############################################################
-        # Extract Play features - Is QB OOP?
-        # BRYCE ADD CODE HERE
-        ############################################################
+            # Extract info from the play
+            team1, team2, ball = extractPlay(week_data, gameId, playId)
+            team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'])
 
-        ############################################################
-        # Extract player influence
-        players_influence = extract_play_players_influence(team2, infl_funct=config['player_infl_funct'], config=config)
+            ############################################################
+            # Extract player influence
+            players_influence = extract_play_players_influence(team2, infl_funct=config['player_infl_funct'], config=config)
 
-        # Extract field price
-        field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+            # Extract field price
+            field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
-        # Calculate defensive scores
-        defence_score = calculate_defense_score(players_influence, field_price)
+            # Calculate defensive scores
+            defence_score = calculate_defense_score(players_influence, field_price)
 
-        # Calculate QB score
-        QB_OOP_Score = calculate_qb_score(team1, ball, config, input_path)
+            # Calculate QB score
+            QB_OOP_Score = calculate_qb_score(team1, ball, config, input_path)
 
-        # Adds both scores
-        pocketScoreTimeSeries = defence_score + QB_OOP_Score
+            # Adds both scores
+            pocketScoreTimeSeries = defence_score + QB_OOP_Score
 
-        # Calculate the final score
-        pocketScore = np.max(pocketScoreTimeSeries)
-        ############################################################
+            # Calculate the final score
+            pocketScore = np.max(pocketScoreTimeSeries)
+            ############################################################
 
-        all_scores_info.append({
-            'gameId': gameId,
-            'playId': playId,
-            'offTeam': team1.team.drop_duplicates().values[0],
-            'pocketScore': pocketScore,
-            'pocketScoreTimeSeries': pocketScoreTimeSeries,
-            # BRYCE ADD ASSOCIATED FEATURE HERE #
-        })
+            all_scores_info.append({
+                'gameId': gameId,
+                'playId': playId,
+                'offTeam': team1.team.drop_duplicates().values[0],
+                'pocketScore': pocketScore,
+                'pocketScoreTimeSeries': pocketScoreTimeSeries
+            })
+            
+        scores = \
+            pd.concat([scores,
+                        pd.DataFrame(all_scores_info).set_index(['gameId', 'playId']).join(plays_qb_in_pocket).reset_index()], 
+                        axis=0)
 
     # Merge scores with play features
-    scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
-    play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1, join="inner")
-
+    play_scores_and_features =  pd.concat([scores.set_index(['gameId', 'playId']), play_features], axis=1, join="inner")
+    
     # Add one additional feature
     play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
-    
+
     # Store DataFrame
     play_scores_and_features.to_csv(scores_and_features_file)
     ##########################################
