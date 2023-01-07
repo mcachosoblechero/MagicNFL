@@ -139,3 +139,4 @@ processing/
 
 # Ignore Apple crap
 .DS_Store*
+exploration/experimentation_pipeline.ipynb
