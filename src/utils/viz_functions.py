@@ -302,7 +302,7 @@ def animateScores(scores, store_path=""):
 
     return HTML(anim.to_html5_video())
 
-def visualize_play(week_data, gameId, playId, config):
+def visualize_play(week_data, gameId, playId, config, display_score = True):
 
     """
     This function visualize a single play, generating all perspectives.
@@ -310,6 +310,7 @@ def visualize_play(week_data, gameId, playId, config):
     :param gameId: GameId to analyze
     :param playId: PlayId to analyze
     :param config: Run Parameters
+    :param display_score: Set whether we should display the score viz
     """
 
     # Full Pitch Evaluation
@@ -342,20 +343,21 @@ def visualize_play(week_data, gameId, playId, config):
     display.display(fig_influence)
     plt.close()
 
-    # Analyze the score timeline
-    # Extract field price
-    field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+    if display_score:
+        # Analyze the score timeline
+        # Extract field price
+        field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
 
-    # Calculate defensive scores
-    pocketScoreTimeSeries = calculate_defense_score(player_infl, field_price)
+        # Calculate defensive scores
+        pocketScoreTimeSeries = calculate_defense_score(player_infl, field_price)
 
-    # Calculate QB score
-    QB_OOP_Score = calculate_qb_score(team1, ball, config)
+        # Calculate QB score
+        QB_OOP_Score = calculate_qb_score(team1, ball, config)
 
-    # Plot frame scores
-    plt.figure(figsize=(8,5))
-    plt.plot(pocketScoreTimeSeries + QB_OOP_Score)
-    plt.title("Score over time")
-    plt.xlabel("Frames")
-    plt.ylabel("Pocket Score")
-    plt.show()
+        # Plot frame scores
+        plt.figure(figsize=(8,5))
+        plt.plot(pocketScoreTimeSeries + QB_OOP_Score)
+        plt.title("Score over time")
+        plt.xlabel("Frames")
+        plt.ylabel("Pocket Score")
+        plt.show()

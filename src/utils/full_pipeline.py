@@ -26,7 +26,7 @@ from src.utils.player_influence import extract_play_players_influence, gaussian_
 from src.utils.field_price_functions import calculate_field_price, gaussian_field_price
 from src.utils.calculate_score import calculate_defense_score, calculate_qb_score
 
-def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"):
+def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots = True, runId = "generic"):
     """
     This function performs all operations required for the pipeline execution, limited to a provided plays. 
     All operations are parametrized through CONFIG
@@ -38,12 +38,15 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     :param plays: List of (weekId, gameId, playId) to analyze
     :param output_path: Path for processed datasets
     :param config: Run Parameters
+    :param timeseries_plots: Boolean determining whether to plot the individual time series
     :param runId: ID to identify each run 
     """
 
     play_features_file = f"{output_path}/play_features_{runId}.csv"
     game_features_file = f"{output_path}/game_features_{runId}.csv"
     scores_and_features_file = f"{output_path}/play_scores_and_features_{runId}.csv"
+    match_scores_file = f"{output_path}/match_scores_and_features_{runId}.csv"
+    season_scores_file = f"{output_path}/season_scores_and_features_{runId}.csv"
 
     ##########################################
     # STEP 1 - CREATE FEATURE VECTOR         #
@@ -144,6 +147,11 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Merge scores with play features
     scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
     play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury, plays_qb_in_pocket], axis=1, join="inner")
+
+    # Add one additional feature
+    play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
+    
+    # Store DataFrame
     play_scores_and_features.to_csv(scores_and_features_file)
     ##########################################
 
@@ -153,8 +161,23 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Perform analysis by Single Play
     evaluate_singleplay_scores(scores_and_features_file)
 
+    # Aggregate by match
+    result = agg_scores_by_match(scores_and_features_file, game_features_file)
+    result.to_csv(match_scores_file)
+
+    # Perform analysis by Match
+    evaluate_match_scores(match_scores_file)
+
+    # Aggregate by season
+    season_result = agg_scores_by_season(scores_and_features_file, game_features_file)
+    season_result.to_csv(season_scores_file)
+
+    # Perform analysis by Match
+    evaluate_season_scores(season_scores_file)
+
     # Extract information regarding Score Time Series
-    evaluate_time_series_score(play_scores_and_features)
+    if timeseries_plots:
+        evaluate_time_series_score(play_scores_and_features)
     ##########################################
 
 def run_full_pipeline(input_path, output_path, config, runId = "generic"):
@@ -263,6 +286,11 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     # Merge scores with play features
     scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
     play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
+
+    # Add one additional feature
+    play_scores_and_features['has_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x.was_qb_sacked==True) | (x.did_qb_stay_in_pocket==False)) else False, axis=0)
+    
+    # Store DataFrame
     play_scores_and_features.to_csv(scores_and_features_file)
 
     ##########################################
