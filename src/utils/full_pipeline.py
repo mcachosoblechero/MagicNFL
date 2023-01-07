@@ -154,15 +154,9 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     # STEP 3 - ANALYZE THE RESULTS           #
     ########################################## 
     # Perform analysis by Single Play
-    print("########################################")
-    print("-> Single Play Analysis")
-    print("########################################")
     evaluate_singleplay_scores(scores_and_features_file)
 
     # Aggregate by match
-    print("########################################")
-    print("-> Match Analysis")
-    print("########################################")
     result = agg_scores_by_match(scores_and_features_file, game_features_file)
     result.to_csv(match_scores_file)
 
@@ -170,9 +164,6 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     evaluate_match_scores(match_scores_file)
 
     # Aggregate by season
-    print("########################################")
-    print("-> Season Analysis")
-    print("########################################")
     season_result = agg_scores_by_season(scores_and_features_file, game_features_file)
     season_result.to_csv(season_scores_file)
 
