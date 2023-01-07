@@ -45,6 +45,8 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     play_features_file = f"{output_path}/play_features_{runId}.csv"
     game_features_file = f"{output_path}/game_features_{runId}.csv"
     scores_and_features_file = f"{output_path}/play_scores_and_features_{runId}.csv"
+    match_scores_file = f"{output_path}/match_scores_and_features_{runId}.csv"
+    season_scores_file = f"{output_path}/season_scores_and_features_{runId}.csv"
 
     ##########################################
     # STEP 1 - CREATE FEATURE VECTOR         #
@@ -153,6 +155,20 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     ########################################## 
     # Perform analysis by Single Play
     evaluate_singleplay_scores(scores_and_features_file)
+
+    # Aggregate by match
+    result = agg_scores_by_match(scores_and_features_file, game_features_file)
+    result.to_csv(match_scores_file)
+
+    # Perform analysis by Match
+    evaluate_match_scores(match_scores_file)
+
+    # Aggregate by season
+    season_result = agg_scores_by_season(scores_and_features_file, game_features_file)
+    season_result.to_csv(season_scores_file)
+
+    # Perform analysis by Match
+    evaluate_season_scores(season_scores_file)
 
     # Extract information regarding Score Time Series
     if timeseries_plots:
