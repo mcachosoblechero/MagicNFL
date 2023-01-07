@@ -54,10 +54,6 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     # Extract whether qb stayed in pocket for a single play
     plays_qb_in_pocket = pd.DataFrame()
 
-
-
-    print("Preprocessing features...")
-
     # Perform all play feature extractions
     plays_outcomes = extract_play_outcome_features(plays_data).set_index(['gameId', 'playId'])
     plays_formation = extract_formation_features(plays_data).set_index(['gameId', 'playId'])
@@ -79,8 +75,6 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     ##########################################
     # STEP 2 - PREPROCESS ALL PLAYS          #
     ##########################################
- 
-    print("Processing plays...")
     # Load information regarding players -- for did_qb_stay_in_pocket
     player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
 
@@ -89,7 +83,8 @@ def run_short_pipeline(input_path, output_path, plays, config, runId = "generic"
     for weekId, play_df in plays.groupby('weekId'):
         
         all_scores_info = []
-        print(weekId)
+        print(f"-> Processing {weekId}")
+        
         # Load information for an entire week
         week_data = pd.read_csv(os.path.join(input_path, weekId))
         plays_qb_in_pocket= extract_did_qb_stay_in_pocket(week_data, player_data, config).set_index(['gameId', 'playId'])
