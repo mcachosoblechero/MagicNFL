@@ -37,7 +37,7 @@ def evaluate_season_scores(scores_file):
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 1
-    cols = 4
+    cols = 5
     # Analysis 1 - Score vs Cum Gained Yards
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
@@ -50,16 +50,22 @@ def evaluate_season_scores(scores_file):
     plt.xlabel("Average Gained yards")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs Avg Gained Yards")
-    # Analysis 3 - Score vs Pocket hold
+    # Analysis 3 - Score vs QB OOP
     plt.subplot(rows,cols,3)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
     plt.xlabel("Percentage Out-of-Pocket")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs %  QB OOP")
-    # Analysis 4 - Score vs Pocket hold
+    # Analysis 4 - Score vs QB Sacked
     plt.subplot(rows,cols,4)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
     plt.xlabel("Percentage QB Sacked")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % QB Sacked")
+    # Analysis 5 - Score vs Pocket hold
+    plt.subplot(rows,cols,5)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
+    plt.xlabel("Percentage Linemen Fail")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % QB Sacked")
 
@@ -153,11 +159,11 @@ def evaluate_match_scores(scores_file):
     # Play Outcome Analysis
     # Figure height and width
     width = 40
-    height = 10
+    height = 20
     plt.figure(figsize=(width,height))
     # Number of subplots
-    rows = 1
-    cols = 5
+    rows = 2
+    cols = 3
     # Analysis 1 - Score vs OOP
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
@@ -170,20 +176,26 @@ def evaluate_match_scores(scores_file):
     plt.xlabel("Percentage QB Sacked")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % QB Sacked")
-    # Analysis 3 - Score vs Cum Gained Yards
+    # Analysis 3 - Score vs Pocket hold
     plt.subplot(rows,cols,3)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
+    plt.xlabel("Percentage Linemen Fail")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % QB Sacked")
+    # Analysis 4 - Score vs Cum Gained Yards
+    plt.subplot(rows,cols,4)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
     plt.xlabel("Cumulative Gained yards")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs Cum Gained Yards")
-    # Analysis 4 - Score vs Avg Gained Yards
-    plt.subplot(rows,cols,4)
+    # Analysis 5 - Score vs Avg Gained Yards
+    plt.subplot(rows,cols,5)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='avgGainedYards')
     plt.xlabel("Average Gained yards")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs Avg Gained Yards")
-    # Analysis 5 - Score vs % Pass complete
-    plt.subplot(rows,cols,5)
+    # Analysis 6 - Score vs % Pass complete
+    plt.subplot(rows,cols,6)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percPassComplete')
     plt.xlabel("Percentage Complete Passes")
     plt.ylabel("Average Pocket Score")
@@ -278,7 +290,7 @@ def evaluate_singleplay_scores(scores_file):
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 1
-    cols = 3
+    cols = 4
     # Analysis 1 - Score vs Gained Yards
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='pocketScore', x='gained_yards')
@@ -297,6 +309,12 @@ def evaluate_singleplay_scores(scores_file):
     plt.xlabel("Did QB stay in pocket?")
     plt.ylabel("Pocket Score")
     plt.title("Score vs QB Stay in Pocket")
+    # Analysis 4 - Score vs Have Linemen Failed?
+    plt.subplot(rows,cols,4)
+    sns.violinplot(data=analysis_results, y='pocketScore', x='have_linemen_failed')
+    plt.xlabel("Have Linemen Failed?")
+    plt.ylabel("Pocket Score")
+    plt.title("Score vs Have Linemen Failed?")
     
     # #################################################################
     # # Formation analysis
@@ -383,83 +401,83 @@ def evaluate_time_series_score(play_scores_and_features):
     :param play_scores_and_features: Information extracted from Pocket analysis
     """
 
-    # Display score time series 
-    # Analyze - Raw Pocket Score
-    plt.figure(figsize=(8,6))
-    legend_labels = []
-    for play_score in play_scores_and_features.iterrows():
-        plt.plot(play_score[1].pocketScoreTimeSeries)
-        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+    # # Display score time series 
+    # # Analyze - Raw Pocket Score
+    # plt.figure(figsize=(8,6))
+    # legend_labels = []
+    # for play_score in play_scores_and_features.iterrows():
+    #     plt.plot(play_score[1].pocketScoreTimeSeries)
+    #     legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
 
-    plt.xlabel("FrameId")
-    plt.ylabel("Pocket Score")
-    plt.title("Raw Pocket Score Analysis")
-    plt.legend(legend_labels)
-    plt.show()
+    # plt.xlabel("FrameId")
+    # plt.ylabel("Pocket Score")
+    # plt.title("Raw Pocket Score Analysis")
+    # plt.legend(legend_labels)
+    # plt.show()
 
-    # Analyze - Pocket Score vs Pass Complete
-    plt.figure(figsize=(8,6))
-    legend_labels = []
-    for play_score in play_scores_and_features.iterrows():
-        if play_score[1].pass_complete == True:
-            colour = "seagreen"
-        else:
-            colour = "lightcoral"
-        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
-        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+    # # Analyze - Pocket Score vs Pass Complete
+    # plt.figure(figsize=(8,6))
+    # legend_labels = []
+    # for play_score in play_scores_and_features.iterrows():
+    #     if play_score[1].pass_complete == True:
+    #         colour = "seagreen"
+    #     else:
+    #         colour = "lightcoral"
+    #     plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+    #     legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
 
-    plt.xlabel("FrameId")
-    plt.ylabel("Pocket Score")
-    plt.title("Pass Complete Analysis")
-    plt.legend(legend_labels)
-    plt.show()
+    # plt.xlabel("FrameId")
+    # plt.ylabel("Pocket Score")
+    # plt.title("Pass Complete Analysis")
+    # plt.legend(legend_labels)
+    # plt.show()
 
-    # Analyze - Pocket Score vs Has Pocket Hold
-    plt.figure(figsize=(8,6))
-    for play_score in play_scores_and_features.iterrows():
-        if play_score[1].has_pocket_hold == True:
-            colour = "seagreen"
-        else:
-            colour = "lightcoral"
-        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
-        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+    # # Analyze - Pocket Score vs Has Pocket Hold
+    # plt.figure(figsize=(8,6))
+    # for play_score in play_scores_and_features.iterrows():
+    #     if play_score[1].has_pocket_hold == True:
+    #         colour = "seagreen"
+    #     else:
+    #         colour = "lightcoral"
+    #     plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+    #     legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
 
-    plt.xlabel("FrameId")
-    plt.ylabel("Pocket Score")
-    plt.title("Has Pocket Hold? Analysis")
-    plt.legend(legend_labels)
-    plt.show()
+    # plt.xlabel("FrameId")
+    # plt.ylabel("Pocket Score")
+    # plt.title("Has Pocket Hold? Analysis")
+    # plt.legend(legend_labels)
+    # plt.show()
 
-    # Analyze - Pocket Score vs Has Pocket Hold
-    plt.figure(figsize=(8,6))
-    for play_score in play_scores_and_features.iterrows():
-        if play_score[1].was_qb_sacked == False:
-            colour = "seagreen"
-        else:
-            colour = "lightcoral"
-        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
-        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
-
-
-    plt.xlabel("FrameId")
-    plt.ylabel("Pocket Score")
-    plt.title("Was QB sacked? Analysis")
-    plt.legend(legend_labels)
-    plt.show()
-
-    # Analyze - Pocket Score vs Has QB remained in Pocket
-    plt.figure(figsize=(8,6))
-    for play_score in play_scores_and_features.iterrows():
-        if play_score[1].did_qb_stay_in_pocket == True:
-            colour = "seagreen"
-        else:
-            colour = "lightcoral"
-        plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
-        legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+    # # Analyze - Pocket Score vs Has Pocket Hold
+    # plt.figure(figsize=(8,6))
+    # for play_score in play_scores_and_features.iterrows():
+    #     if play_score[1].was_qb_sacked == False:
+    #         colour = "seagreen"
+    #     else:
+    #         colour = "lightcoral"
+    #     plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+    #     legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
 
 
-    plt.xlabel("FrameId")
-    plt.ylabel("Pocket Score")
-    plt.title("Did QB Remain in Pocket? Analysis")
-    plt.legend(legend_labels)
-    plt.show()
+    # plt.xlabel("FrameId")
+    # plt.ylabel("Pocket Score")
+    # plt.title("Was QB sacked? Analysis")
+    # plt.legend(legend_labels)
+    # plt.show()
+
+    # # Analyze - Pocket Score vs Has QB remained in Pocket
+    # plt.figure(figsize=(8,6))
+    # for play_score in play_scores_and_features.iterrows():
+    #     if play_score[1].did_qb_stay_in_pocket == True:
+    #         colour = "seagreen"
+    #     else:
+    #         colour = "lightcoral"
+    #     plt.plot(play_score[1].pocketScoreTimeSeries, c=colour)
+    #     legend_labels.append(str(play_score[0][0]) + ' - ' + str(play_score[0][1]))
+
+
+    # plt.xlabel("FrameId")
+    # plt.ylabel("Pocket Score")
+    # plt.title("Did QB Remain in Pocket? Analysis")
+    # plt.legend(legend_labels)
+    # plt.show()
