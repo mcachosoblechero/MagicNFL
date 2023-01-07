@@ -418,7 +418,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Have Linemen Failed? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='have_linemen_failed', ci=95)
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='have_linemen_failed', errorbar=('ci', 95))
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Have Linemen Failed?")
     plt.legend()
@@ -426,7 +426,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Did QB stay in pocket? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='did_qb_stay_in_pocket', ci=95)
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='did_qb_stay_in_pocket', errorbar=('ci', 95))
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Did QB stay in pocket?")
     plt.legend()
@@ -434,7 +434,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Was QB Sacked? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='was_qb_sacked', ci=95)
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='was_qb_sacked', errorbar=('ci', 95))
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Was QB sacked?")
     plt.legend()
@@ -442,7 +442,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Achieved Pos Yards Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='achieved_pos_yards', ci=95)
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='achieved_pos_yards', errorbar=('ci', 95))
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Has achieved positive yards?")
     plt.legend()
