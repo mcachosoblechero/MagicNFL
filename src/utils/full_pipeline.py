@@ -19,7 +19,7 @@ from IPython.display import HTML
 from IPython import display
 
 from src.utils.play_preprocessing import extractPlay, preprocessPlay_refQB_NFrames
-from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features, extract_did_qb_stay_in_pocket
+from src.utils.feature_extraction import extract_formation_features, extract_foul_features, extract_injury_features, extract_play_outcome_features, extract_game_features, extract_did_qb_stay_in_pocket, determine_pocket_outcome
 from src.utils.scores_agg import agg_scores_by_match, agg_scores_by_season
 from src.utils.evaluate_scores import evaluate_singleplay_scores, evaluate_match_scores, evaluate_season_scores, evaluate_time_series_score
 from src.utils.player_influence import extract_play_players_influence, gaussian_player_influence_score
@@ -135,8 +135,9 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     # Merge scores with play features
     play_scores_and_features =  pd.concat([scores.set_index(['gameId', 'playId']), play_features], axis=1, join="inner")
     
-    # Add one additional feature
+    # Add one additional features
     play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
+    play_scores_and_features['pocket_outcome'] = play_scores_and_features.apply(determine_pocket_outcome, axis=1)
 
     # Store DataFrame
     play_scores_and_features.to_csv(scores_and_features_file)

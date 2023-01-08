@@ -500,4 +500,13 @@ def did_qb_stay_in_pocket(play_df, config):
     
     return(qb_stayed_in_pocket)
 
+def determine_pocket_outcome(play_data):
+    if (play_data.was_qb_sacked == False) & (play_data.did_qb_stay_in_pocket == True):
+        return "QB remained in pocket and was not sacked"
+    elif (play_data.was_qb_sacked == True) & (play_data.did_qb_stay_in_pocket == True):
+        return "In-Pocket QB Sack"
+    else:
+        return "Out-of-Pocket QB"
+
+
 ################################################################

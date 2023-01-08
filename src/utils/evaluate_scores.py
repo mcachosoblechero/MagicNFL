@@ -405,20 +405,31 @@ def evaluate_time_series_score(play_scores_and_features):
     timeseries = []
     for play_score in play_scores_and_features.iterrows():
         for idx, timepoint in enumerate(play_score[1].pocketScoreTimeSeries):
-            timeseries.append({
-                'frameId': idx,
-                'frameValue': timepoint,
-                'achieved_pos_yards': play_score[1].achieved_pos_yards,
-                "was_qb_sacked": play_score[1].was_qb_sacked,
-                "did_qb_stay_in_pocket": play_score[1].did_qb_stay_in_pocket,
-                "have_linemen_failed": play_score[1].have_linemen_failed
-            })
+            if idx <= 80:
+                timeseries.append({
+                    'frameId': idx,
+                    'frameValue': timepoint,
+                    'achieved_pos_yards': play_score[1].achieved_pos_yards,
+                    "was_qb_sacked": play_score[1].was_qb_sacked,
+                    "did_qb_stay_in_pocket": play_score[1].did_qb_stay_in_pocket,
+                    "have_linemen_failed": play_score[1].have_linemen_failed,
+                    "pocket_outcome": play_score[1].pocket_outcome,
+                    "pass_complete": play_score[1].pass_complete,
+                })
 
     df_timeseries = pd.DataFrame(timeseries)
 
+    # Pocket Type Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='pocket_outcome', ci=95)
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis - Have Linemen Failed?")
+    plt.legend()
+    plt.show()
+
     # Have Linemen Failed? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='have_linemen_failed', errorbar=('ci', 95))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='have_linemen_failed', ci=95)
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Have Linemen Failed?")
     plt.legend()
@@ -426,7 +437,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Did QB stay in pocket? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='did_qb_stay_in_pocket', errorbar=('ci', 95))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='did_qb_stay_in_pocket', ci=95)
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Did QB stay in pocket?")
     plt.legend()
@@ -434,7 +445,7 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Was QB Sacked? Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='was_qb_sacked', errorbar=('ci', 95))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='was_qb_sacked', ci=95)
     plt.ylabel("Pocket Score")
     plt.title("Pocket Score Analysis - Was QB sacked?")
     plt.legend()
@@ -442,9 +453,9 @@ def evaluate_time_series_score(play_scores_and_features):
 
     # Achieved Pos Yards Time Series
     plt.figure(figsize=(8,6))
-    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='achieved_pos_yards', errorbar=('ci', 95))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='pass_complete', ci=95)
     plt.ylabel("Pocket Score")
-    plt.title("Pocket Score Analysis - Has achieved positive yards?")
+    plt.title("Pocket Score Analysis - Was pass completed?")
     plt.legend()
     plt.show()
 
