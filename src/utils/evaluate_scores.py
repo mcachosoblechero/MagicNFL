@@ -32,12 +32,46 @@ def evaluate_season_scores(scores_file):
     #################################################################
     # Play Outcome Analysis
     # Figure height and width
-    width = 40
+    width = 20
+    height = 20
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 2
+    cols = 2
+    # Analysis 1 - Score vs % Off Linemen Fail
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
+    plt.xlabel("Percentage Off Linemen Fail")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % Off Linemen Failed")
+    # Analysis 2 - Score vs % Complete Passes
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percPassComplete')
+    plt.xlabel("Percentage Complete Passes")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % Complete Pass")
+    # Analysis 3 - Score vs QB OOP
+    plt.subplot(rows,cols,3)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
+    plt.xlabel("Percentage Out-of-Pocket")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs %  QB Out-of-Pocket Plays")
+    # Analysis 4 - Score vs QB Sacked
+    plt.subplot(rows,cols,4)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
+    plt.xlabel("Percentage QB Sacked")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % QB Sacked")
+
+    #################################################################
+    # Yardage Analysis
+    # Figure height and width
+    width = 20
     height = 10
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 1
-    cols = 5
+    cols = 2
     # Analysis 1 - Score vs Cum Gained Yards
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
@@ -50,34 +84,17 @@ def evaluate_season_scores(scores_file):
     plt.xlabel("Average Gained yards")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs Avg Gained Yards")
-    # Analysis 3 - Score vs QB OOP
-    plt.subplot(rows,cols,3)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
-    plt.xlabel("Percentage Out-of-Pocket")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs %  QB OOP")
-    # Analysis 4 - Score vs QB Sacked
-    plt.subplot(rows,cols,4)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
-    plt.xlabel("Percentage QB Sacked")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % QB Sacked")
-    # Analysis 5 - Score vs Pocket hold
-    plt.subplot(rows,cols,5)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
-    plt.xlabel("Percentage Off Linemen Fail")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % Off Linemen Failed Sacked")
+
 
     #################################################################
     # Game Analysis
     # Figure height and width
-    width = 30
+    width = 20
     height = 10
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 1
-    cols = 3
+    cols = 2
     # Analysis 1 - Avg Pocket Score vs Cum Score
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumScore')
@@ -90,9 +107,19 @@ def evaluate_season_scores(scores_file):
     plt.xlabel("Average Season Score")
     plt.ylabel("Average Pocket Score")
     plt.title("Avg Pocket Score vs Avg Score")
+
+    #################################################################
+    # Season Analysis
+    # Figure height and width
+    width = 10
+    height = 10
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 1
     # Analysis 3 - Avg Pocket Score vs Games Won
-    plt.subplot(rows,cols,3)
-    sns.violinplot(data=analysis_results, y='avgPocketScore', x='gamesWon')
+    plt.subplot(rows,cols,1)
+    sns.violinplot(data=analysis_results, y='avgPocketScore', x='gamesWon', palette=['lightcoral', 'seagreen'])
     plt.xlabel("Games Won")
     plt.ylabel("Average Pocket Score")
     plt.title("Avg Pocket Score vs Games Won")
@@ -158,52 +185,39 @@ def evaluate_match_scores(scores_file):
     #################################################################
     # Play Outcome Analysis
     # Figure height and width
-    width = 40
+    width = 20
     height = 20
     plt.figure(figsize=(width,height))
     # Number of subplots
     rows = 2
-    cols = 3
-    # Analysis 1 - Score vs OOP
+    cols = 2
+    # Analysis 1 - Score vs Off Linemen Failed
     plt.subplot(rows,cols,1)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
-    plt.xlabel("Percentage Out-of-Pocket Plays")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % OOP")
-    # Analysis 2 - Score vs Pocket hold
-    plt.subplot(rows,cols,2)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
-    plt.xlabel("Percentage QB Sacked")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % QB Sacked")
-    # Analysis 3 - Score vs Off Linemen Failed
-    plt.subplot(rows,cols,3)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percLinemenFail')
     plt.xlabel("Percentage Off Linemen Fail")
     plt.ylabel("Average Pocket Score")
-    plt.title("Score vs % Off Linemen Failed Sacked")
-    # Analysis 4 - Score vs Cum Gained Yards
-    plt.subplot(rows,cols,4)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
-    plt.xlabel("Cumulative Gained yards")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs Cum Gained Yards")
-    # Analysis 5 - Score vs Avg Gained Yards
-    plt.subplot(rows,cols,5)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='avgGainedYards')
-    plt.xlabel("Average Gained yards")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs Avg Gained Yards")
-    # Analysis 6 - Score vs % Pass complete
-    plt.subplot(rows,cols,6)
+    plt.title("Score vs % Off Linemen Failed")
+    # Analysis 2 - Score vs % Pass complete
+    plt.subplot(rows,cols,2)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percPassComplete')
     plt.xlabel("Percentage Complete Passes")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % Complete pass")
-
+    # Analysis 3 - Score vs QB sacked
+    plt.subplot(rows,cols,3)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
+    plt.xlabel("Percentage QB Sacked")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % QB Sacked")
+    # Analysis 4 - Score vs OOP
+    plt.subplot(rows,cols,4)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
+    plt.xlabel("Percentage Out-of-Pocket Plays")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs % Out-of-Pocket Plays")
 
     #################################################################
-    # Game Analysis
+    # Match Yards Analysis
     # Figure height and width
     width = 20
     height = 10
@@ -211,15 +225,44 @@ def evaluate_match_scores(scores_file):
     # Number of subplots
     rows = 1
     cols = 2
-    # Analysis 1 - Score vs Gained Yards
+    # Analysis 4 - Score vs Cum Gained Yards
+    plt.subplot(rows,cols,1)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='cumGainedYards')
+    plt.xlabel("Cumulative Gained yards")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Cum Gained Yards")
+    # Analysis 5 - Score vs Avg Gained Yards
+    plt.subplot(rows,cols,2)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='avgGainedYards')
+    plt.xlabel("Average Gained yards")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs Avg Gained Yards")
+
+    #################################################################
+    # Game Analysis
+    # Figure height and width
+    width = 8
+    height = 6
+    # We divide the Game Score analysis to the Game analysis
+    # Game Score Analysis
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 1
+    # Analysis 1 - Score vs Game Score
     plt.subplot(rows,cols,1)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='gameScore')
     plt.xlabel("Game Score")
     plt.ylabel("Average Pocket Score")
     plt.title("Avg Pocket Score vs Game Score")
-    # Analysis 2 - Score vs Pass complete
-    plt.subplot(rows,cols,2)
-    sns.violinplot(data=analysis_results, y='avgPocketScore', x='wonGame')
+
+    plt.figure(figsize=(width,height))
+    # Number of subplots
+    rows = 1
+    cols = 1
+    # Analysis 2 - Score vs Did Team Win game?
+    plt.subplot(rows,cols,1)
+    sns.violinplot(data=analysis_results, y='avgPocketScore', x='wonGame', palette=['lightcoral', 'seagreen'])
     plt.xlabel("Did the team won the game?")
     plt.ylabel("Average Pocket Score")
     plt.title("Avg Pocket Score vs Game Result")
@@ -285,36 +328,36 @@ def evaluate_singleplay_scores(scores_file):
     #################################################################
     # Play Outcome Analysis
     # Figure height and width
-    width = 40
-    height = 10
+    width = 20
+    height = 20
     plt.figure(figsize=(width,height))
     # Number of subplots
-    rows = 1
-    cols = 4
-    # Analysis 1 - Score vs Gained Yards
+    rows = 2
+    cols = 2
+    # Analysis 1 - Score vs Have Linemen Failed?
     plt.subplot(rows,cols,1)
-    sns.scatterplot(data=analysis_results, y='pocketScore', x='gained_yards')
-    plt.xlabel("Gained yards")
+    sns.violinplot(data=analysis_results, y='pocketScore', x='have_linemen_failed', palette=['seagreen', 'lightcoral'])
+    plt.xlabel("Have Off Linemen Failed?")
     plt.ylabel("Pocket Score")
-    plt.title("Score vs Gained Yards")
-    # Analysis 2 - Score vs Pocket hold
+    plt.title("Score vs Have Off Linemen Failed?")
+    # Analysis 1 - Score vs Pass Complete
     plt.subplot(rows,cols,2)
-    sns.violinplot(data=analysis_results, y='pocketScore', x='was_qb_sacked')
+    sns.violinplot(data=analysis_results, y='pocketScore', x='pass_complete', palette=['lightcoral', 'seagreen'])
+    plt.xlabel("Was pass complete?")
+    plt.ylabel("Pocket Score")
+    plt.title("Score vs Was Pass Complete?")
+    # Analysis 2 - Score vs Pocket hold
+    plt.subplot(rows,cols,3)
+    sns.violinplot(data=analysis_results, y='pocketScore', x='was_qb_sacked', palette=['seagreen', 'lightcoral'])
     plt.xlabel("Was QB sacked?")
     plt.ylabel("Pocket Score")
-    plt.title("Score vs QB Sacked")
+    plt.title("Score vs Was QB Sacked?")
     # Analysis 3 - Score vs QB Out of Pocket
-    plt.subplot(rows,cols,3)
-    sns.violinplot(data=analysis_results, y='pocketScore', x='did_qb_stay_in_pocket')
+    plt.subplot(rows,cols,4)
+    sns.violinplot(data=analysis_results, y='pocketScore', x='did_qb_stay_in_pocket', palette=['lightcoral', 'seagreen'])
     plt.xlabel("Did QB stay in pocket?")
     plt.ylabel("Pocket Score")
-    plt.title("Score vs QB Stay in Pocket")
-    # Analysis 4 - Score vs Have Linemen Failed?
-    plt.subplot(rows,cols,4)
-    sns.violinplot(data=analysis_results, y='pocketScore', x='have_linemen_failed')
-    plt.xlabel("Have Linemen Failed?")
-    plt.ylabel("Pocket Score")
-    plt.title("Score vs Have Linemen Failed?")
+    plt.title("Score vs Did QB Stay in Pocket?")
     
     # #################################################################
     # # Formation analysis
@@ -423,7 +466,7 @@ def evaluate_time_series_score(play_scores_and_features):
     plt.figure(figsize=(8,6))
     sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='pocket_outcome', ci=95)
     plt.ylabel("Pocket Score")
-    plt.title("Pocket Score Analysis - Have Linemen Failed?")
+    plt.title("Pocket Score Analysis - Pocket Outcome")
     plt.legend()
     plt.show()
 
