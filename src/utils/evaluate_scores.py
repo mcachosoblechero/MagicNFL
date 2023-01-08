@@ -119,7 +119,7 @@ def evaluate_season_scores(scores_file):
     cols = 1
     # Analysis 3 - Avg Pocket Score vs Games Won
     plt.subplot(rows,cols,1)
-    sns.violinplot(data=analysis_results, y='avgPocketScore', x='gamesWon', palette=['lightcoral', 'seagreen'])
+    sns.violinplot(data=analysis_results, y='avgPocketScore', x='gamesWon')
     plt.xlabel("Games Won")
     plt.ylabel("Average Pocket Score")
     plt.title("Avg Pocket Score vs Games Won")
