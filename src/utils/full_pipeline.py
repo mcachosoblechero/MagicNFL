@@ -222,6 +222,9 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     for i in range(num_weeks):
         week_files.append(f'week{i+1}.csv')
 
+    # Load information regarding players -- for did_qb_stay_in_pocket
+    player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
+
     # For all weeks, extract scores
     all_scores_info = []
     for week_file in week_files:
@@ -230,6 +233,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 
         # Load information for an entire week
         week_data = pd.read_csv(os.path.join(input_path, week_file))
+        plays_qb_in_pocket= extract_did_qb_stay_in_pocket(week_data, player_data, config).set_index(['gameId', 'playId'])
 
         # Extract information about the associated games and plays
         unique_ids = week_data[['gameId', 'playId']].drop_duplicates().values
@@ -268,16 +272,22 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
                 'gameId': gameId,
                 'playId': playId,
                 'offTeam': team1.team.drop_duplicates().values[0],
-                'pocketScore': pocketScore 
+                'pocketScore': pocketScore,
+                'pocketScoreTimeSeries': pocketScoreTimeSeries
             })
+            
+        scores = \
+            pd.concat([scores,
+                        pd.DataFrame(all_scores_info).set_index(['gameId', 'playId']).join(plays_qb_in_pocket).reset_index()], 
+                        axis=0)
 
     # Merge scores with play features
-    scores = pd.DataFrame(all_scores_info).set_index(['gameId', 'playId'])
     play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
 
-    # Add one additional feature
-    play_scores_and_features['has_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x.was_qb_sacked==True) | (x.did_qb_stay_in_pocket==False)) else False, axis=0)
-    
+    # Add one additional features
+    play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
+    play_scores_and_features['pocket_outcome'] = play_scores_and_features.apply(determine_pocket_outcome, axis=1)
+
     # Store DataFrame
     play_scores_and_features.to_csv(scores_and_features_file)
 
