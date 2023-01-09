@@ -318,7 +318,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     team1, team2, ball = extractPlay(week_data, gameId, playId)
 
     # Plot the play in Full Field
-    fig_field = animatePlay_Generic(team1, team2, ball, drawPitch(), store_path=f"../videos/{gameId}_{playId}_fullPitch.mp4")
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPitch(), store_path=f"../videos/{gameId}_{playId}_fullPitch.gif")
     display.display(fig_field)
     plt.close()
 
@@ -326,7 +326,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
 
     # Plot the play in the Pocket
-    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(config['pocket_len']), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(config['pocket_len']), store_path=f"../videos/{gameId}_{playId}_pocket.gif")
     display.display(fig_field)
     plt.close()
 
@@ -339,7 +339,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     )
 
     # Plot the play
-    fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.mp4")
+    fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.gif")
     display.display(fig_influence)
     plt.close()
 
