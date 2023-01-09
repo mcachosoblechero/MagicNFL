@@ -135,7 +135,7 @@ def run_short_pipeline(input_path, output_path, plays, config, timeseries_plots 
     # Merge scores with play features
     play_scores_and_features =  pd.concat([scores.set_index(['gameId', 'playId']), play_features], axis=1, join="inner")
     
-    # Add one additional features
+    # Add additional features
     play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
     play_scores_and_features['pocket_outcome'] = play_scores_and_features.apply(determine_pocket_outcome, axis=1)
 
@@ -285,7 +285,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
     # Merge scores with play features
     play_scores_and_features =  pd.concat([scores, plays_outcomes, plays_formation, plays_fouls, plays_injury], axis=1)
 
-    # Add one additional features
+    # Add additional features
     play_scores_and_features['have_linemen_failed'] = play_scores_and_features.apply(lambda x: True if ((x['was_qb_sacked']==True) | (x['did_qb_stay_in_pocket']==False)) else False, axis=1)
     play_scores_and_features['pocket_outcome'] = play_scores_and_features.apply(determine_pocket_outcome, axis=1)
 
