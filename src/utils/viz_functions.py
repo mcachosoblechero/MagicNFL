@@ -318,7 +318,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     team1, team2, ball = extractPlay(week_data, gameId, playId)
 
     # Plot the play in Full Field
-    fig_field = animatePlay_Generic(team1, team2, ball, drawPitch(), store_path=f"../videos/{gameId}_{playId}_fullPitch.mp4")
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPitch(), store_path=f"../videos/{gameId}_{playId}_fullPitch.gif")
     display.display(fig_field)
     plt.close()
 
@@ -326,7 +326,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
 
     # Plot the play in the Pocket
-    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(config['pocket_len']), store_path=f"../videos/{gameId}_{playId}_pocket.mp4")
+    fig_field = animatePlay_Generic(team1, team2, ball, drawPocket(config['pocket_len']), store_path=f"../videos/{gameId}_{playId}_pocket.gif")
     display.display(fig_field)
     plt.close()
 
@@ -339,7 +339,7 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
     )
 
     # Plot the play
-    fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.mp4")
+    fig_influence = animateScores(player_infl, store_path=f"../videos/{gameId}_{playId}_player_influence.gif")
     display.display(fig_influence)
     plt.close()
 
@@ -361,3 +361,65 @@ def visualize_play(week_data, gameId, playId, config, display_score = True):
         plt.xlabel("Frames")
         plt.ylabel("Pocket Score")
         plt.show()
+
+def visualize_plays_time_series(play_metadata, config):
+
+    """
+    This function visualize the time series of a set of plays, categorizing them based on their outcome.
+    :param play_metadata: Metadata information for all the plays. This should contain week, gameId, playId and outcome
+    :param config: Run Parameters
+    :param display_score: Set whether we should display the score viz
+    """
+
+    # Extract time series information
+    score_evolution = pd.DataFrame()
+    score_evolution['Score_timeseries'] = play_metadata.apply(process_timeseries_play, config=config, axis=1)
+    score_evolution['Outcome'] = play_metadata.outcome
+
+    # Convert DataFrame to unrolled version for time series
+    timeseries = []
+    for play_score in score_evolution.iterrows():
+        for idx, timepoint in enumerate(play_score[1].Score_timeseries):
+            if idx <= 80:
+                timeseries.append({
+                    'frameId': idx,
+                    'frameValue': timepoint,
+                    'outcome': play_score[1].Outcome,
+                })
+    df_timeseries = pd.DataFrame(timeseries)
+
+    # Pocket Type Time Series
+    plt.figure(figsize=(8,6))
+    sns.lineplot(data=df_timeseries, x='frameId', y='frameValue', hue='outcome')
+    plt.ylabel("Pocket Score")
+    plt.title("Pocket Score Analysis")
+    plt.legend()
+    plt.show()
+
+def process_timeseries_play(x, config):
+
+    # Extract info from the play
+    team1, team2, ball = extractPlay(x.week_data, x.gameId, x.playId)
+
+    # Preprocess the play
+    team1, team2, ball = config['preprocess_funct'](team1, team2, ball, delay_frame=config['hold_QB_ref'], post_snap_time=config['post_snap_time'])
+
+    # Analyze the position of the defensive players
+    # Calculate players influence
+    player_infl = extract_play_players_influence(
+        team_def=team2,
+        infl_funct=config['player_infl_funct'],
+        config=config
+    )
+
+    # Analyze the score timeline
+    # Extract field price
+    field_price = calculate_field_price(price_funct=config['field_price_funct'], config=config)
+
+    # Calculate defensive scores
+    pocketScoreTimeSeries = calculate_defense_score(player_infl, field_price)
+
+    # Calculate QB score
+    QB_OOP_Score = calculate_qb_score(team1, ball, config)
+
+    return pocketScoreTimeSeries + QB_OOP_Score
