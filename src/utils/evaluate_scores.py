@@ -50,18 +50,18 @@ def evaluate_season_scores(scores_file):
     plt.xlabel("Percentage Complete Passes")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % Complete Pass")
-    # Analysis 3 - Score vs QB OOP
+    # Analysis 3 - Score vs QB Sacked
     plt.subplot(rows,cols,3)
-    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
-    plt.xlabel("Percentage Out-of-Pocket")
-    plt.ylabel("Average Pocket Score")
-    plt.title("Score vs %  QB Out-of-Pocket Plays")
-    # Analysis 4 - Score vs QB Sacked
-    plt.subplot(rows,cols,4)
     sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBSacked')
     plt.xlabel("Percentage QB Sacked")
     plt.ylabel("Average Pocket Score")
     plt.title("Score vs % QB Sacked")
+    # Analysis 4 - Score vs QB OOP
+    plt.subplot(rows,cols,4)
+    sns.scatterplot(data=analysis_results, y='avgPocketScore', x='percQBOOP')
+    plt.xlabel("Percentage Out-of-Pocket")
+    plt.ylabel("Average Pocket Score")
+    plt.title("Score vs %  QB Out-of-Pocket Plays")
 
     #################################################################
     # Yardage Analysis
