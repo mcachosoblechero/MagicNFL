@@ -224,6 +224,7 @@ def run_full_pipeline(input_path, output_path, config, runId = "generic"):
 
     # Load information regarding players -- for did_qb_stay_in_pocket
     player_data = pd.read_csv(os.path.join(input_path, 'players.csv'))
+    scores=pd.DataFrame()
 
     # For all weeks, extract scores
     all_scores_info = []
