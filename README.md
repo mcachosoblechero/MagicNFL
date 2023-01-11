@@ -48,7 +48,7 @@ This framing raises the following questions:
 
 From visual analysis, this is a consistent way of determining the pocket across different plays and formations.  The choice of a circle was chosen because that is the approximate shape that the offensive line ends up forming as the offensive tackles attempt to push their rushers "out-and-up". 
 
-![test.gif](attachment:fa6d9ab2-e518-4d92-ba29-d9e73c791f94.gif)
+![download](https://user-images.githubusercontent.com/10617948/211914959-2327cb6c-3b20-4c31-80ef-f593b9907b39.gif)
 
 ## 2. How valuable is the pocket area?
 
